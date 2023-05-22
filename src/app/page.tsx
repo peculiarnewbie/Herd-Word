@@ -5,6 +5,7 @@ import styles from './page.module.css'
 
 import TextInput from './components/TextInput'
 import DefaultForm from './components/Form';
+import TestButton from './components/TestButton';
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
           <TextInput></TextInput>
           <DefaultForm></DefaultForm>
         </div>
+        <TestButton></TestButton>
       </div>
 
       <div className={styles.center}>
