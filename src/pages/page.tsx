@@ -8,15 +8,47 @@ import DefaultForm from '../components/Form';
 import TestButton from '../components/TestButton';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 
+import Ably from 'ably'
+import { useEffect, useState } from 'react';
+
 type MyPageProps = {
   text: string;
 }
 
 const lmaoo = "cmooon"
 
+let globalChannel:Ably.Types.RealtimeChannelPromise;
+
 export default function Home({
   thing,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+  useEffect(() => {
+    async function AblySubscribe(){
+      const ably = new Ably.Realtime.Promise('Hgkx7A.855WWQ:G5X9DQEhQSB97zTtT0GdJb_I9monkLkJZjPbdhgR7b0');
+      await ably.connection.once('connected');
+      console.log('Connected to Ably!');
+    
+      globalChannel = ably.channels.get('quickstart');
+      await globalChannel.subscribe('greeting', (message) => {
+        console.log('Received a greeting message in realtime: ' + message.data.name + ' ' + message.data.answer)
+      });
+    }
+
+    AblySubscribe()
+
+    return () => {
+      globalChannel.detach();
+  	};
+
+  }, []);
+
+  
+  const AblyTest = async () => {
+    await globalChannel.publish('greeting', {name: "madafakaa", answer:"elegiga"});
+    
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -24,7 +56,7 @@ export default function Home({
           <TextInput></TextInput>
           <DefaultForm></DefaultForm>
         </div>
-        <TestButton></TestButton>
+        <TestButton AblyTest={AblyTest}></TestButton>
         <p>{thing.text}</p>
       </div>
 
