@@ -2,6 +2,7 @@ import React from 'react';
 import * as Form from '@radix-ui/react-form';
 import './styles.css';
 import { Redis } from "@upstash/redis";
+import pubTest from '../pages/api/v1/pubTest.js';
 
 const TestButton = () => (
 
@@ -11,14 +12,8 @@ const TestButton = () => (
 );
 
 const CallTest = async () => {
-    const redis = Redis.fromEnv();
-    redis.hset("teshash", {
-        "aloo" : "hiyaa"
-    });
     console.log("calling test")
-    await fetch("../pages/api/v1/pubTest", {
-        method: "GET"
-        })
+    pubTest();
 }
 
 export default TestButton;
