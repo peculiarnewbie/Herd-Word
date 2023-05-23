@@ -20,7 +20,7 @@ type MyPageProps = {
 }
 
 async function getUpstash(){
-  const data = await fetch("https://joint-bullfrog-35191.upstash.io/set/foo/bar", {
+  const data = await fetch("https://joint-bullfrog-35191.upstash.io/get/foo/", {
   headers: {
     Authorization: process.env.UPSTASH_REDIS_REST_TOKEN as string
   },
