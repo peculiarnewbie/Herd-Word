@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { Redis } from "@upstash/redis";
 
 export default async function App(){
+  const data = await getUpstash()
     return(
     <div>
-      <h1>nvm</h1>
+      <h1>{data}</h1>
       <Link href="/page">
         page
       </Link>
@@ -18,18 +19,14 @@ type MyPageProps = {
 }
 
 async function getUpstash(){
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL as string,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
-  });
+  const data = await fetch("https://joint-bullfrog-35191.upstash.io/set/foo/bar", {
+  headers: {
+    Authorization: "Bearer ********"
+  }
+}).then(response => response.json())
+  .then(data => console.log(data));
 
-  const thing = "cmooon";
-
-  console.log("elo")
-  const eyy = await redis.hset("teshash", {
-      "ssr" : "lulknu"
-  });
-  console.log(eyy)
+  const thing = "yooo";
 
   return thing
 }
