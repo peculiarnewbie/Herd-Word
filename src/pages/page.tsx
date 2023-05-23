@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image'
 import styles from '../app/page.module.css'
 
@@ -10,10 +8,6 @@ import TestButton from '../components/TestButton';
 import Ably from 'ably'
 import { useEffect, useState } from 'react';
 import { Redis } from '@upstash/redis';
-
-type MyPageProps = {
-  text: string;
-}
 
 const lmaoo = "cmooon"
 

@@ -5,8 +5,8 @@ import { Redis } from "@upstash/redis";
 export default async function App(){
   const data = await getUpstash()
     return(
-        <div>
-      <h1>{data.props.thing.text}</h1>
+    <div>
+      <h1>{data}</h1>
       <Link href="/page">
         page
       </Link>
@@ -24,17 +24,13 @@ async function getUpstash(){
     token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
   });
 
-  const thing = {text: "newone"} as MyPageProps;
+  const thing = "cmooon";
 
   console.log("elo")
   const eyy = await redis.hset("teshash", {
-      "ssr" : "emezing"
+      "ssr" : "lulknu"
   });
   console.log(eyy)
 
-  return {
-      props: {
-          thing
-      }
-  }
+  return thing
 }
