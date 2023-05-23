@@ -7,7 +7,7 @@ export default async function App(){
     return(
     <div>
       
-      <h1>{data}</h1>
+      <h1>{data.result}</h1>
       <Link href="/page">
         page
       </Link>
