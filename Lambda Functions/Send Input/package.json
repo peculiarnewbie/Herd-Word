@@ -1,0 +1,14 @@
+{
+  "name": "send-input",
+  "version": "1.0.0",
+  "description": "herd-word input sender",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@upstash/redis": "^1.20.6"
+  }
+}

@@ -7,7 +7,7 @@ export default async function App(){
     return(
     <div>
       
-      <h1>{data.result}</h1>
+      <h1>{data}</h1>
       <Link href="/page">
         page
       </Link>
@@ -20,14 +20,9 @@ type MyPageProps = {
 }
 
 async function getUpstash(){
-  const data = await fetch("https://joint-bullfrog-35191.upstash.io/get/foo/", {
-  headers: {
-    Authorization: process.env.UPSTASH_REDIS_REST_TOKEN as string
-  },
-  next: {revalidate: 10, tags: ['collection']}
-}).then(response => response.json());
-
-  const thing = "yooo";
+  
+  const redis = Redis.fromEnv();
+  const data = await redis.set("grrreat", "bartt");
 
   return data
 }
