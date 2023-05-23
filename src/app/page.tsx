@@ -6,6 +6,7 @@ export default async function App(){
   const data = await getUpstash()
     return(
     <div>
+      
       <h1>{data}</h1>
       <Link href="/page">
         page
@@ -24,10 +25,9 @@ async function getUpstash(){
     Authorization: process.env.UPSTASH_REDIS_REST_TOKEN as string
   },
   next: {revalidate: 10, tags: ['collection']}
-}).then(response => response.json())
-  .then(data => console.log(data));
+}).then(response => response.json());
 
   const thing = "yooo";
 
-  return thing
+  return data
 }
