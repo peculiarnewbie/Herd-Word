@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { Redis } from "@upstash/redis";
 
 export default async function App(){
-  const data = await getUpstash()
     return(
     <div>
       <h1>nvm</h1>
-      <p>wtf</p>
+      <Link href="/page">
+        page
+      </Link>
     </div>
     )
 }
