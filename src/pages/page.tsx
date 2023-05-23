@@ -6,10 +6,10 @@ import styles from '../app/page.module.css'
 import TextInput from '../components/TextInput'
 import DefaultForm from '../components/Form';
 import TestButton from '../components/TestButton';
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 
 import Ably from 'ably'
 import { useEffect, useState } from 'react';
+import { Redis } from '@upstash/redis';
 
 type MyPageProps = {
   text: string;
@@ -18,10 +18,18 @@ type MyPageProps = {
 const lmaoo = "cmooon"
 
 let globalChannel:Ably.Types.RealtimeChannelPromise;
+let incr = 0
+let blytest = true;
 
-export default function Home({
-  thing,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function incrementsht():boolean{
+  incr++;
+  if(incr > 4)
+    return true;
+  else
+    return false;
+}
+
+export default function Home(){
 
   useEffect(() => {
     async function AblySubscribe(){
@@ -31,7 +39,13 @@ export default function Home({
     
       globalChannel = ably.channels.get('quickstart');
       await globalChannel.subscribe('greeting', (message) => {
-        console.log('Received a greeting message in realtime: ' + message.data.name + ' ' + message.data.answer)
+        if(!incrementsht())
+          console.log('Received a greeting message in realtime: ' + message.data.name + ' ' + message.data.answer)
+        else{
+          console.log('Received a greeting message in realtime: ' + message.data.name + ' ' + message.data.answer)
+          if(blytest)
+            AblyTest2();
+        }
       });
     }
 
@@ -49,6 +63,11 @@ export default function Home({
     
   }
 
+  const AblyTest2 = async () => {
+    blytest = false;
+    await globalChannel.publish('greeting', {name: "woi", answer:"tpp much"});
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -57,7 +76,7 @@ export default function Home({
           <DefaultForm></DefaultForm>
         </div>
         <TestButton AblyTest={AblyTest}></TestButton>
-        <p>{thing.text}</p>
+        <p>text</p>
       </div>
 
       <div className={styles.center}>
@@ -126,15 +145,3 @@ export default function Home({
   )
 }
 
-export const getServerSideProps: GetServerSideProps<{
-  thing: MyPageProps;
-}> = async() => {
-  const thing = {text: "cmooon"} as MyPageProps;
-  console.log("haha")
-
-  return {
-      props: {
-          thing
-      }
-  }
-}

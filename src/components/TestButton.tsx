@@ -4,6 +4,7 @@ import './styles.css';
 import pubTest from '../pages/api/v1/pubTest.js';
 import Ably from 'ably'
 
+//@ts-ignore
 export function TestButton({AblyTest}){
 
   return(
@@ -12,10 +13,6 @@ export function TestButton({AblyTest}){
     </button>
   )
 };
-
-const CallTest = async (channel:any) => {
-  await channel.publish('greeting', 'hello!');
-}
 
 
 
