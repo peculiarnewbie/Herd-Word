@@ -7,9 +7,7 @@ export default async function App(){
     return(
     <div>
       <h1>nvm</h1>
-      <Link href="/page">
-        page
-      </Link>
+      <p>wtf</p>
     </div>
     )
 }
