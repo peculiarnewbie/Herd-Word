@@ -23,7 +23,7 @@ async function getUpstash(){
   headers: {
     Authorization: process.env.UPSTASH_REDIS_REST_TOKEN as string
   },
-  next: {revalidate: 10}
+  next: {revalidate: 10, tags: ['collection']}
 }).then(response => response.json())
   .then(data => console.log(data));
 
