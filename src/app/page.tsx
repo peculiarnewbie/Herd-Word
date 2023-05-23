@@ -6,7 +6,7 @@ export default async function App(){
   const data = await getUpstash()
     return(
     <div>
-      <h1>{data}</h1>
+      <h1>nvm</h1>
       <Link href="/page">
         page
       </Link>
