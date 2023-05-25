@@ -7,22 +7,33 @@ const redis = new Redis({
 
 export const handler = async (event, context) => {
     const roomId = event.roomId;
+    const userId = event.userId;
+    
+    console.log({roomId, userId})
 
-    const keys = [`herdword:${roomId}`];
-	const args = ["id"]
+    const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`];
+	const args = ["cRound", `${userId}`]
 
     const createRoom = await redis.eval(
         `local roomInfo = redis.call('HGET', KEYS[1], ARGV[1])
 
-        if roomInfo == nil then
-            redis.call('HSET', KEYS[1], "id", ARGV[1], "currentRound", 0)
+        if not roomInfo then
+            redis.call('HSET', KEYS[1], "id", ARGV[1], "cRound", 0)
+            redis.call('ZADD', KEYS[2], 0, ARGV[2])
             return {"created new room", "null"}
+        elseif roomInfo == '0' then
+            redis.call('ZADD', KEYS[2], 0, ARGV[2])
+            local players = redis.call('ZRANGE', KEYS[2], 0, -1)
+            return {"joined the room", players}
         else
-            return {"room already exist", roomInfo}
+            --check for hot joining
+            return {"room is playing", roomInfo}
         end`,
         keys,
         args
     );
 
-    console.log(createRoom[0]);
+    console.log(createRoom);
+    
+    return createRoom
 }
