@@ -15,16 +15,27 @@ export const handler = async (event, context) => {
 	const args = ["cRound", `${userId}`]
 
     const createRoom = await redis.eval(
-        `local roomInfo = redis.call('HGET', KEYS[1], ARGV[1])
+        `
+        local function checkPlayer(name)
+            local exist = redis.call('ZSCORE', KEYS[2], name)
+            return exist
+        end
+
+        local roomInfo = redis.call('HGET', KEYS[1], ARGV[1])
 
         if not roomInfo then
             redis.call('HSET', KEYS[1], "id", ARGV[1], "cRound", 0)
             redis.call('ZADD', KEYS[2], 0, ARGV[2])
             return {"created new room", "null"}
         elseif roomInfo == '0' then
-            redis.call('ZADD', KEYS[2], 0, ARGV[2])
-            local players = redis.call('ZRANGE', KEYS[2], 0, -1)
-            return {"joined the room", players}
+            local exist = checkPlayer(ARGV[2])
+            if not exist then
+                redis.call('ZADD', KEYS[2], 0, ARGV[2])
+                local players = redis.call('ZRANGE', KEYS[2], 0, -1)
+                return {"joined the room", players}
+            else
+                return {"change name pls", "someone got there first"}
+            end
         else
             --check for hot joining
             return {"room is playing", roomInfo}
