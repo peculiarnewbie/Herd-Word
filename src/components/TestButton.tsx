@@ -5,10 +5,10 @@ import pubTest from '../pages/api/v1/pubTest.js';
 import Ably from 'ably'
 
 //@ts-ignore
-export function TestButton({AblyTest}){
+export function TestButton({FunctionToCall}){
 
   return(
-    <button className="Button" onClick={AblyTest}>
+    <button className="Button" onClick={FunctionToCall}>
       TestPub
     </button>
   )

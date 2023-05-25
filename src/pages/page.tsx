@@ -69,7 +69,7 @@ export default function Home(){
           <TextInput></TextInput>
           <DefaultForm></DefaultForm>
         </div>
-        <TestButton AblyTest={AblyTest}></TestButton>
+        <TestButton FunctionToCall={AblyTest}></TestButton>
         <p>text</p>
       </div>
 
