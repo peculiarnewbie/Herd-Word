@@ -1,10 +1,8 @@
-
-
 import TextInput from "@/components/TextInput";
 import TestButton from "@/components/TestButton";
 import Link from 'next/link'
 import { Redis } from "@upstash/redis";
-import * as Form from '@radix-ui/react-form';
+import FormDemo from "@/components/Form";
 import CustomForm from "@/components/CustomForm";
 
 // let roomId = ""
@@ -30,8 +28,8 @@ export default function App(){
     myHeaders.append("Content-Type", "text/plain");
     
     var raw = JSON.stringify({
-      "roomId": `"${roomId}"`,
-      "userId": `"${playerId}"`
+      "roomId": `${roomId}`,
+      "userId": `${playerId}`
     });
     
     var requestOptions = {
@@ -55,7 +53,7 @@ export default function App(){
         page
       </Link>
 
-      <CustomForm onClick={CreateRoom}></CustomForm>
+      <FormDemo onClick={CreateRoom}></FormDemo>
 
       {/* <form onSubmit={CallCreateRoom}>
       <label htmlFor="name">Name</label>
