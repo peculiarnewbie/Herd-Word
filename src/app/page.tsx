@@ -4,12 +4,12 @@ import Link from 'next/link'
 import { Redis } from "@upstash/redis";
 import FormDemo from "@/components/Form";
 import CustomForm from "@/components/CustomForm";
+import { cookies } from 'next/headers';
 
 // let roomId = ""
 // let playerId = ""
 
 export default function App(){
-  
 
   //@ts-ignore
   // const CallCreateRoom = async (event) => {
@@ -43,6 +43,7 @@ export default function App(){
       .then(response => response.text())
 
     console.log(result);
+
     return result;
   }
     return(
