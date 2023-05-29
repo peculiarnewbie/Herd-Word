@@ -1,87 +1,69 @@
-"use client"
+
 import Home from "../pages/page";
 import TextInput from "@/components/TextInput";
 import TestButton from "@/components/TestButton";
 import Link from 'next/link'
 import { Redis } from "@upstash/redis";
-import { useState } from "react";
 import * as Form from '@radix-ui/react-form';
+import CustomForm from "@/components/CustomForm";
 
-let roomId = ""
-let playerId = ""
+// let roomId = ""
+// let playerId = ""
 
 export default function App(){
-  // const [roomId, setRoomId] = useState("null")
-  // const [playerId, setPlayerId] = useState("null");
+  
 
-  const CreateRoom = async () => {
+  //@ts-ignore
+  // const CallCreateRoom = async (event) => {
+  //   event.preventDefault();
+  //   roomId = event.target.name.value;
+  //   playerId = event.target.room.value;
+
+  //   await CreateRoom();
+  // }
+  const CreateRoom = async (roomId, playerId) => {
+    'use server';
+    
+    console.log("at server", roomId, playerId);
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "text/plain");
     
     var raw = JSON.stringify({
-      "roomId": `${roomId}`,
-      "userId": `${playerId}`
+      "roomId": `"${roomId}"`,
+      "userId": `"${playerId}"`
     });
     
     var requestOptions = {
       method: 'POST',
-      mode: 'no-cors',
       headers: myHeaders,
       body: raw
     };
     
     //@ts-ignore
-    fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/tryagane", requestOptions)
+    const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/createroom", requestOptions)
       .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
+
+    console.log(result);
+    return result;
   }
     return(
     <div>
       
-      <h1>Welcome bitches</h1>
+      <h1>Welcome folks</h1>
       <Link href="/page">
         page
       </Link>
 
-      <Form.Root onSubmit={(event) => {
-        event.preventDefault();
-        const data = Object.fromEntries(new FormData(event.currentTarget));
-        console.log("submitting", data);
-        //@ts-ignore
-        roomId = data.roomId
-        //@ts-ignore
-        playerId = data.playerId
-        CreateRoom()
-      }} className="FormRoot">
-        <Form.Field className="FormField" name="playerId">
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <Form.Label className="FormLabel">Name</Form.Label>
-            <Form.Message className="FormMessage" match="valueMissing">
-              Please enter your name
-            </Form.Message>
-          </div>
-          <Form.Control asChild>
-            <input className="Input" required />
-          </Form.Control>
-        </Form.Field>
-        <Form.Field className="FormField" name="roomId">
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <Form.Label className="FormLabel">Room ID</Form.Label>
-            <Form.Message className="FormMessage" match="valueMissing">
-              Please enter a question
-            </Form.Message>
-          </div>
-          <Form.Control asChild>
-            <input className="Input" required />
-          </Form.Control>
-        </Form.Field>
-        <Form.Submit asChild>
-          <button className="Button" style={{ marginTop: 10 }}>
-            Continue
-          </button>
-        </Form.Submit>
-      </Form.Root>
+      <CustomForm onClick={CreateRoom}></CustomForm>
+
+      {/* <form onSubmit={CallCreateRoom}>
+      <label htmlFor="name">Name</label>
+      <input type="text" id="name" name="name" required />
+      <label htmlFor="name">Room</label>
+      <input type="text" id="roomName" name="room" required />
+        <button type="submit">Add to Cart</button>
+      </form> */}
     </div>
     )
 }
