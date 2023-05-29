@@ -26,19 +26,20 @@ export const handler = async (event, context) => {
         if not roomInfo then
             redis.call('HSET', KEYS[1], "id", ARGV[1], "cRound", 0)
             redis.call('ZADD', KEYS[2], 0, ARGV[2])
-            return {"created new room", "null"}
+            return '{"code": 102, "message":"created new room", "players": ["' .. ARGV[2] .. '"]}'
         elseif roomInfo == '0' then
             local exist = checkPlayer(ARGV[2])
             if not exist then
                 redis.call('ZADD', KEYS[2], 0, ARGV[2])
                 local players = redis.call('ZRANGE', KEYS[2], 0, -1)
-                return {"joined the room", players}
+                local playersString = table.concat(players, '", "')
+                return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
             else
-                return {"change name pls", "someone got there first"}
+                return '{"code": 103, "message":"name exists in room", "players": "null"}'
             end
         else
             --check for hot joining
-            return {"room is playing", roomInfo}
+            return '{"code": 104, "message":"room is playing", "players": "null"}'
         end`,
         keys,
         args
@@ -49,9 +50,10 @@ export const handler = async (event, context) => {
     const response = {
         statusCode: 200,
         headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*', // replace with hostname of frontend (CloudFront)
-          "Access-Control-Allow-Credentials": true, 
+          'Access-Control-Allow-Origin': 'https://herd-word-qx25ygijz-peculiarnewbie.vercel.app/',
+            'Access-Control-Allow-Credentials': true,
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
         body: createRoom
       };

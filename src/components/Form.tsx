@@ -11,7 +11,8 @@ const FormDemo = ({onClick}) => {
     console.log(event.target.room.value, event.target.name.value)
 
     const result = await onClick(event.target.room.value, event.target.name.value);
-    console.log(result);
+    const parsed = await JSON.parse(result).body;
+    console.log(parsed)
   }
   
   return (
