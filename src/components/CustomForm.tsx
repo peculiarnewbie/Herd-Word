@@ -9,7 +9,8 @@ const CustomForm = ({ onClick }) => {
         console.log("called")
         console.log(event.target.room.value, event.target.name.value)
 
-        await onClick(event.target.room.value, event.target.name.value);
+        const result = await onClick(event.target.room.value, event.target.name.value);
+        console.log(result);
     }
   // this effect runs only in the browser
   // useEffect(() => {
