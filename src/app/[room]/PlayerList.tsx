@@ -30,26 +30,6 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
             
     }, [])
 
-    useEffect(() => {
-        const  ConnectToAbly = async () => {
-            const ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
-            await ably.connection.once('connected');
-            console.log('Connected to Ably!');
-          
-            globalChannel = ably.channels.get('herdword');
-            await globalChannel.subscribe(roomId, (message) => {
-              console.log('Received a greeting message in realtime: ' + message.data)
-            });
-          }
-      
-          ConnectToAbly()
-      
-          return () => {
-            globalChannel.detach();
-            };
-
-    }, []);
-
     return(
         <>
             <ScrollArea.Root className="ScrollAreaRoot">
