@@ -8,11 +8,12 @@ const redis = new Redis({
 export const handler = async (event, context) => {
     const roomId = event.roomId;
     const userId = event.userId;
+    const fromCookie = event.fromCookie
     
-    console.log({roomId, userId})
+    console.log({roomId, userId, fromCookie})
 
     const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`];
-	const args = ["cRound", `${userId}`]
+	const args = ["cRound", `${userId}`, fromCookie]
 
     const createRoom = await redis.eval(
         `
@@ -26,20 +27,25 @@ export const handler = async (event, context) => {
         if not roomInfo then
             redis.call('HSET', KEYS[1], "id", ARGV[1], "cRound", 0)
             redis.call('ZADD', KEYS[2], 0, ARGV[2])
-            return '{"code": 102, "message":"created new room", "players": ["' .. ARGV[2] .. '"]}'
+            return '{"code": 101, "message": "created new room", "players": ["' .. ARGV[2] .. '"]}'
         elseif roomInfo == '0' then
             local exist = checkPlayer(ARGV[2])
-            if not exist then
+            if exist and not ARGV[3]  then
+                return '{"code": 104, "message":"name exists in room", "players": "null"}'
+            else
                 redis.call('ZADD', KEYS[2], 0, ARGV[2])
                 local players = redis.call('ZRANGE', KEYS[2], 0, -1)
                 local playersString = table.concat(players, '", "')
-                return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
-            else
-                return '{"code": 103, "message":"name exists in room", "players": "null"}'
+                
+                if exist then
+                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"]}'
+                else
+                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
+                end
             end
         else
             --check for hot joining
-            return '{"code": 104, "message":"room is playing", "players": "null"}'
+            return '{"code": 105, "message":"room is playing", "players": "null"}'
         end`,
         keys,
         args
