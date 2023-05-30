@@ -1,15 +1,34 @@
 'use client'
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import RoomLobby from "./RoomLobby"
 
 //@ts-ignore
-export default async function PlayerCheck({CreateRoom, roomId}) {
-    const playerId = useSearchParams()?.get('playerId')
+export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) {
+    const playerIdFromQuery = useSearchParams()?.get('playerId')
+    // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
+    const [joined, setJoined] = useState(false)
     const [showInput, setShowInput] = useState(false)
+    const [players, setPlayers] = useState([''])
+    let fromCookie = false;
+    let playerId = ""
 
     useEffect(() => {
-        console.log(playerId, roomId);
+        if(playerIdFromQuery){
+            playerId = playerIdFromQuery;
+            fromCookie = false;
+        }
+        else if(playerIdCookie){
+            playerId = playerIdCookie
+            fromCookie = true;
+        }
+        else{
+            setMessage(`input name`)
+            setJoined(false)
+            return;
+        }
+        console.log(playerId, roomId, fromCookie);
 
         const  CheckPlayer = async () => {
             if(playerId){
@@ -17,22 +36,36 @@ export default async function PlayerCheck({CreateRoom, roomId}) {
         
                 console.log(result);
                 
-                if(result.code == 101 || result.code == 102){
-                    document.cookie = `playerId=${playerId}`
+                if(result.code == 101){
+                    if(!fromCookie) document.cookie = `playerId=${playerId}`
+                    document.cookie = `isMaster=true`
+                    setShowInput(false);
+                    setMessage(`created room as ${playerId}`)
+                    setJoined(true)
+                }
+                else if(result.code == 102){
+                    if(!fromCookie) document.cookie = `playerId=${playerId}`
                     setShowInput(false);
                     setMessage(`welcome, ${playerId}`)
+                    setJoined(true)
                 }
                 else if(result.code == 103){
+                    setMessage(`welcome back, ${playerId}`)
+                    setJoined(true)
+                }
+                else if(result.code == 104){
                     setMessage(`name exists in room`)
+                    setJoined(false)
+                    return;
                 }
                 else{
                     setMessage(`sht broke`)
+                    setJoined(false)
+                    return;
                 }
+                setPlayers(result.players)
                 console.log(result)
                 console.log(message);
-            }
-            else{
-                setMessage(`input name`)
             }
         }
 
@@ -41,6 +74,6 @@ export default async function PlayerCheck({CreateRoom, roomId}) {
 
     }, [])
     return(
-        <p>{message}</p>
+        <RoomLobby joined={joined} message={message} players={players}></RoomLobby>
     )
 }

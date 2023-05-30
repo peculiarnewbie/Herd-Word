@@ -15,10 +15,13 @@ export default async function Page({ params }: { params: { room: string } }){
     
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "text/plain");
+
+        const fromCookie = playerId? true : false
         
         var raw = JSON.stringify({
           "roomId": `${passedRoom}`,
-          "userId": `${passedPlayer}`
+          "userId": `${passedPlayer}`,
+          "fromCookie": fromCookie
         });
         
         var requestOptions = {
@@ -39,45 +42,10 @@ export default async function Page({ params }: { params: { room: string } }){
 
     
 
-    if(!playerId){
-        return(
-            //@ts-ignore
-            <PlayerCheck CreateRoom={CreateRoom} roomId = {roomId}></PlayerCheck>
-        )
-        // const result = await CreateRoom()
-        // const parsed = await JSON.parse(result).body;
-
-        // if(parsed.code == 103){
-        //     return <p>name exists in room</p>
-        // }
-        // else{
-        //     return(
-        //         <div>
-        //             <p>welcome to {params.room}, {playerId}</p>
-        //             <p>players: {parsed.players}</p>
-        //         </div>
-        //     )
-        // }
-    }
-
-    else{
-        const result = await CreateRoom(roomId, playerId)
-        if(result.code == 102){
-            return(
-                <p>joined as {playerId}</p>
-            )
-        }
-        else if (result.code == 103){
-            return(
-                <p>welcome back, {playerId}</p>
-            )
-        }
-        else if(result.code == 101){
-            return(
-                <p>created room as {playerId}</p>
-            )
-        }
-    }
+    return(
+        //@ts-ignore
+        <PlayerCheck CreateRoom={CreateRoom} roomId = {roomId} playerIdCookie={playerId}></PlayerCheck>
+    )
 
     
 }
