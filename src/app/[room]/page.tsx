@@ -72,6 +72,11 @@ export default async function Page({ params }: { params: { room: string } }){
                 <p>welcome back, {playerId}</p>
             )
         }
+        else if(result.code == 101){
+            return(
+                <p>created room as {playerId}</p>
+            )
+        }
     }
 
     

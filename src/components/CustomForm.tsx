@@ -28,7 +28,7 @@ const CustomForm = ({ onClick }) => {
       <input type="text" id="name" name="name" required />
       <label htmlFor="name">Room</label>
       <input type="text" id="roomName" name="room" required />
-        <button type="submit">Add to Cart</button>
+        <button  type="submit">Add to Cart</button>
       </form>
   );
 };

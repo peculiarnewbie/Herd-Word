@@ -11,41 +11,8 @@ import { cookies } from 'next/headers';
 
 export default function App(){
 
-  //@ts-ignore
-  // const CallCreateRoom = async (event) => {
-  //   event.preventDefault();
-  //   roomId = event.target.name.value;
-  //   playerId = event.target.room.value;
-
-  //   await CreateRoom();
-  // }
-  const CreateRoom = async (roomId, playerId) => {
-    'use server';
-    
-    console.log("at server", roomId, playerId);
-
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "text/plain");
-    
-    var raw = JSON.stringify({
-      "roomId": `${roomId}`,
-      "userId": `${playerId}`
-    });
-    
-    var requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw
-    };
-    
-    //@ts-ignore
-    const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/createroom", requestOptions)
-      .then(response => response.text())
-
-    console.log(result);
-
-    return result;
-  }
+  const playerId = cookies().get("playerId")?.value;
+  
     return(
     <div>
       
@@ -54,7 +21,7 @@ export default function App(){
         page
       </Link>
 
-      <FormDemo onClick={CreateRoom}></FormDemo>
+      <FormDemo playerId = {playerId}></FormDemo>
 
       {/* <form onSubmit={CallCreateRoom}>
       <label htmlFor="name">Name</label>

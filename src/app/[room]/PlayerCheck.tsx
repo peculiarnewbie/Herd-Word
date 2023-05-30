@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 export default async function PlayerCheck({CreateRoom, roomId}) {
     const playerId = useSearchParams()?.get('playerId')
     const [message, setMessage] = useState("")
-    const [showInput, setShowInput] = useState(true)
+    const [showInput, setShowInput] = useState(false)
 
     useEffect(() => {
         console.log(playerId, roomId);
