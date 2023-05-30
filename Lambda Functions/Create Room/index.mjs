@@ -1,9 +1,11 @@
 import { Redis } from "@upstash/redis"
+import Ably from 'ably'
 
 const redis = new Redis({
     url: process.env.HERD_UPSTASH_REDIS_REST_URL,
     token:process.env.HERD_UPSTASH_REDIS_REST_TOKEN,
 })
+
 
 export const handler = async (event, context) => {
     const roomId = event.roomId;
@@ -12,7 +14,7 @@ export const handler = async (event, context) => {
     
     console.log({roomId, userId, fromCookie})
 
-    const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`];
+    const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`, `herdword:${roomId}:messages`];
 	const args = ["cRound", `${userId}`, fromCookie]
 
     const createRoom = await redis.eval(
@@ -40,6 +42,7 @@ export const handler = async (event, context) => {
                 if exist then
                     return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"]}'
                 else
+                    redis.call('PUBLISH', KEYS[3], ARGV[2])
                     return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
                 end
             end
@@ -53,6 +56,18 @@ export const handler = async (event, context) => {
 
     console.log("we here", createRoom);
 
+    const parsed = JSON.parse(JSON.stringify(createRoom));
+
+    if(parsed.code == 102)
+    {
+        const ably = new Ably.Realtime.Promise(process.env.HERD_ABLY_API_KEY)
+        await ably.connection.once('connected');
+        const channel = ably.channels.get('herdword');
+        await channel.publish(roomId, userId);
+        console.log("published")
+        ably.close()
+    }
+
     const response = {
         statusCode: 200,
         headers: { 
@@ -63,6 +78,8 @@ export const handler = async (event, context) => {
         },
         body: createRoom
       };
+
+
     
     return response
 }

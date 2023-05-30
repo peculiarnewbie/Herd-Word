@@ -81,6 +81,11 @@ export default function PlayerCheck({CreateRoom, roomId, playerIdCookie, SubToRe
 
     }, [])
     return(
-        <RoomLobby joined={joined} message={message} players={players} loading={loading}></RoomLobby>
+        <RoomLobby
+        joined={joined} 
+        message={message} 
+        players={players} 
+        loading={loading} 
+        roomId={roomId}></RoomLobby>
     )
 }

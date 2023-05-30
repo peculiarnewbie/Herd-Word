@@ -1,10 +1,13 @@
 import PlayerList from "./PlayerList";
 import NameField from "@/components/NameField";
 import * as Form from '@radix-ui/react-form';
+import { useEffect } from "react";
+import Ably from 'ably'
 
 
-export default function RoomLobby({loading, joined, message, players }: {loading:boolean, joined:boolean, message:string, players:string[]}){
-    
+
+export default function RoomLobby({loading, joined, message, players, roomId }: {loading:boolean, joined:boolean, message:string, players:string[], roomId:string}){
+
     if(loading){
         return(
             <p>loading...</p>
@@ -15,7 +18,7 @@ export default function RoomLobby({loading, joined, message, players }: {loading
         return(
             <>
                 <p>{message}</p>
-                <PlayerList players={players}></PlayerList>
+                <PlayerList players={players} roomId={roomId}></PlayerList>
             </>
         )
     }

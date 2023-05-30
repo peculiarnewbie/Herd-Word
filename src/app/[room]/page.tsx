@@ -57,7 +57,7 @@ export default async function Page({ params }: { params: { room: string } }){
         await redisSub.connect();
 
         //@ts-ignore
-        await redisSub.subscribe(`${roomId}:messages`, (err, res) => {
+        await redisSub.subscribe(`herdword:${roomId}:messages`, (err, res) => {
             if (err) {
               console.error(err);
             } else {
