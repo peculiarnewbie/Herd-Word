@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import * as Form from '@radix-ui/react-form';
 import { useRouter } from 'next/navigation';
 import './styles.css';
-import NameField from './NameField';
+import HomeNameField from './HomeNameField';
+import FormButton from './FormButton';
 
 
 //@ts-ignore
@@ -31,7 +32,7 @@ const FormDemo = ({playerId}) => {
   
   return (
     <Form.Root onSubmit={CallCreateRoom} className="FormRoot">
-      <NameField playerId = {showName} setPlayerId={setShowName}></NameField>
+      <HomeNameField playerId = {showName} setPlayerId={setShowName}></HomeNameField>
       <Form.Field className="FormField" name="room">
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
           <Form.Label className="FormLabel">Room</Form.Label>
@@ -43,11 +44,7 @@ const FormDemo = ({playerId}) => {
           <input className="Input" />
         </Form.Control>
       </Form.Field>
-      <Form.Submit asChild>
-        <button className="Button" style={{ marginTop: 10 }}>
-          Continue
-        </button>
-      </Form.Submit>
+      <FormButton withButton={true}></FormButton>
     </Form.Root>
   )
 };
