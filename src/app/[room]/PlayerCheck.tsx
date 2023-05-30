@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import RoomLobby from "./RoomLobby"
 
 //@ts-ignore
-export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) {
+export default function PlayerCheck({CreateRoom, roomId, playerIdCookie, SubToRedis}) {
     const playerIdFromQuery = useSearchParams()?.get('playerId')
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
@@ -42,6 +42,7 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
                 if(result.code == 101){
                     if(!fromCookie) document.cookie = `playerId=${playerId}`
                     document.cookie = `isMaster=true`
+                    const subResult = await SubToRedis();
                     setShowInput(false);
                     setMessage(`created room as ${playerId}`)
                     setJoined(true)
