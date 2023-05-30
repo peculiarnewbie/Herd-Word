@@ -3,8 +3,14 @@ import NameField from "@/components/NameField";
 import * as Form from '@radix-ui/react-form';
 
 
-export default function RoomLobby({joined, message, players }: {joined:boolean, message:string, players:string[]}){
+export default function RoomLobby({loading, joined, message, players }: {loading:boolean, joined:boolean, message:string, players:string[]}){
     
+    if(loading){
+        return(
+            <p>loading...</p>
+        )
+    }
+
     if(joined){
         return(
             <>

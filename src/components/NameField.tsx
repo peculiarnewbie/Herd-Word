@@ -1,5 +1,6 @@
 import * as Form from '@radix-ui/react-form';
 import FormButton from './FormButton';
+import './styles.css';
 
 export default function NameField({withButton} : {withButton:boolean}){
     let button

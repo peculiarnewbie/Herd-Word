@@ -8,7 +8,8 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
     const playerIdFromQuery = useSearchParams()?.get('playerId')
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
-    const [joined, setJoined] = useState(false)
+    const [joined, setJoined] = useState(true)
+    const [loading, setLoading] = useState(true)
     const [showInput, setShowInput] = useState(false)
     const [players, setPlayers] = useState([''])
     let fromCookie = false;
@@ -18,6 +19,7 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
         if(playerIdFromQuery){
             playerId = playerIdFromQuery;
             fromCookie = false;
+            history.replaceState({}, document.title, `/${roomId}`);
         }
         else if(playerIdCookie){
             playerId = playerIdCookie
@@ -26,6 +28,7 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
         else{
             setMessage(`input name`)
             setJoined(false)
+            setLoading(false);
             return;
         }
         console.log(playerId, roomId, fromCookie);
@@ -56,17 +59,20 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
                 else if(result.code == 104){
                     setMessage(`name exists in room`)
                     setJoined(false)
+                    setLoading(false)
                     return;
                 }
                 else{
                     setMessage(`sht broke`)
                     setJoined(false)
+                    setLoading(false)
                     return;
                 }
                 setPlayers(result.players)
                 console.log(result)
                 console.log(message);
             }
+            setLoading(false)
         }
 
         //@ts-ignore
@@ -74,6 +80,6 @@ export default async function PlayerCheck({CreateRoom, roomId, playerIdCookie}) 
 
     }, [])
     return(
-        <RoomLobby joined={joined} message={message} players={players}></RoomLobby>
+        <RoomLobby joined={joined} message={message} players={players} loading={loading}></RoomLobby>
     )
 }
