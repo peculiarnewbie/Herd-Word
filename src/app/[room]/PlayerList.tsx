@@ -53,7 +53,7 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
                 </ScrollArea.Scrollbar>
                 <ScrollArea.Corner className="ScrollAreaCorner" />
             </ScrollArea.Root>
-            <p>there's {playersArr.length} players</p>
+            <p>theres {playersArr.length} players</p>
         </>
     )
 }
