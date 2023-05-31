@@ -12,6 +12,7 @@ export default function HomeNameField({playerId, setPlayerId}){
 
     const DeleteIdCookie = () => {
         document.cookie = "playerId=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
         console.log("deleted cookie")
         setPlayerId("null");
     }

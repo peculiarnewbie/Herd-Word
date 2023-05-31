@@ -18,7 +18,7 @@ export default async function Page({ params }: { params: { room: string } }){
         var raw = JSON.stringify({
           "roomId": `${passedRoom}`,
           "userId": `${passedPlayer}`,
-          "fromCookie": fromCookie
+          "fromCookie": `${fromCookie}`
         });
         
         var requestOptions = {

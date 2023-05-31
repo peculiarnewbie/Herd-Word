@@ -25,21 +25,18 @@ export const handler = async (event, context) => {
         `
         local currentRound = redis.call('HINCRBY', KEYS[1], 'cRound', 1)
         
+        local answers = redis.call('HGETALL', KEYS[2])
+        local answersString = table.concat(answers, '", "')
+
+        local playerInputs = redis.call('ZREVRANGE', KEYS[3], '0', '-1', 'WITHSCORES')
+        local playersString = table.concat(playerInputs, '", "')
+
         if ARGV[1] == '0' then
-            
-            return '{"cRound": ' .. currentRound .. ', "chosenAnswers": "null", "highestAnswers": "null"}'
-        elseif ARGV[1] == '1' then
-            --use this later to reveal who input the answers
-            --local chosenAnswers = redis.call('ZRANDMEMBER', KEYS[3], ARGV[2], 'WITHSCORES')
-            local chosenAnswers = redis.call('HRANDFIELD', KEYS[2], ARGV[2], 'WITHVALUES')
-            local chosenString = table.concat(chosenAnswers, '", "')
-            return '{"cRound": ' .. currentRound .. ', "chosenAnswers": ["' .. chosenString .. '"], "highestAnswers": "null" }'
+        return '{"cRound": ' .. currentRound .. ', "answers": "null", "rankedAnswers": "null"}'
         else
-            local highestAnswers = redis.call('ZREVRANGE', KEYS[4], '0', '2', 'WITHSCORES')
+            local highestAnswers = redis.call('ZREVRANGE', KEYS[4], '0', '-1', 'WITHSCORES')
             local highestString = table.concat(highestAnswers, '", "')
-            local chosenAnswers = redis.call('ZRANGE', KEYS[4], '0', '1', 'WITHSCORES')
-            local chosenString = table.concat(chosenAnswers, '", "')
-            return '{"cRound": ' .. currentRound .. ', "chosenAnswers": ["' .. chosenString .. '"], "highestAnswers": ["' .. highestString .. '"]}'
+            return '{"cRound": ' .. currentRound .. ', "answers": ["' .. answersString .. '"], "rankedAnswers": ["' .. highestString .. '"], "playerInputs": ["' .. playersString .. '"]}'
         end`,
         keys,
         args
@@ -49,34 +46,72 @@ export const handler = async (event, context) => {
 
     const parsed = JSON.parse(JSON.stringify(advanceRound));
 
-    const highestAnswers = parsed.highestAnswers;
+    const answers = parsed.answers;
+    const rankedAnswers = parsed.rankedAnswers;
+    const playerInputs = parsed.playerInputs;
+    let answersArr = [];
+    let playerInputsArr = [];
     let highestArr = [];
-    const chosenAnswers = parsed.chosenAnswers;
+    let lowestArr = [];
+    let top5Arr = [];
     let chosenArr = [];
-    
-    if(highestAnswers != "null")
-    {
-        for(let i = 0; i < highestAnswers.length; i+=2){
-            let counts = false
-            if(highestAnswers[i+1] = highestAnswers[1]) counts = true;
-            let obj = {input: highestAnswers[i], score: highestAnswers[i + 1], counts: counts}
-            highestArr.push(obj);
-        }
-    }
 
-    if(round == '1'){
-        if(chosenAnswers != "null"){
-            for(let i = 0; i < chosenAnswers.length; i+=2){
-                
-                chosenArr.push(chosenAnswers[i]);
+    if(rankedAnswers != 'null'){
+        for(let i = 0; i < rankedAnswers.length; i+=2){
+            let obj = {inputId: rankedAnswers[i], input:answers[rankedAnswers[i]] , score: rankedAnswers[i + 1]}
+            if(rankedAnswers[i+1] = rankedAnswers[1]) highestArr.push(obj);
+            if(rankedAnswers[i+1] == 1) lowestArr.push(obj);
+            answersArr.push(obj);
+            playerInputsArr.push({playerId: playerInputs[i], inputId: playerInputs[i+1]})
+        }
+
+        if(round == '1'){
+            const min = 0;
+            const max = playerInputs.length/2 - 1;
+            const randomInt1 = (Math.floor(Math.random() * (max - min + 1)) + min) * 2;
+            let randomInt2 = (Math.floor(Math.random() * (max - min + 1)) + min) * 2;
+            while(randomInt1 == randomInt2){
+                randomInt2 = (Math.floor(Math.random() * (max - min + 1)) + min) * 2;
+            } 
+            
+            chosenArr.push({playerId: playerInputs[randomInt1], input: answersArr[playerInputs[randomInt1+1]].input},
+                            {playerId: playerInputs[randomInt2], input: answersArr[playerInputs[randomInt2+1]].input})
+        }
+        else{
+            let highestString = ""
+            let loneString = ''
+    
+            for(let i = 0; i < highestArr.length; i++){
+                highestString+= `'${highestArr[i].inputId}'`
+            }
+    
+            if(lowestArr.length > 2){
+                const min = 0;
+                const max = lowestArr.length;
+                const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                while(randomInt1 == randomInt2) randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                chosenArr.push(lowestArr[randomInt1], lowestArr[randomInt2])
+            }
+            else{
+                chosenArr.push(answersArr[answersArr.length-1], answersArr[answersArr.length-2])
+            }
+    
+            for(let i = 0; i < 5; i++){
+                top5Arr.push(answersArr[i])
+                if(i == answersArr.length - 1) break;
             }
         }
+        
+
     }
+
+
 
 
     let JSONResponse = {round: parsed.cRound,
                         chosenAnswers: chosenArr,
-                        highestAnswers: highestArr}
+                        highestAnswers: top5Arr}
 
     console.log(JSONResponse);
     

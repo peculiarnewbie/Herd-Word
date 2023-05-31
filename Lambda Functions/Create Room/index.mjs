@@ -39,7 +39,7 @@ export const handler = async (event, context) => {
             return '{"code": 101, "message": "created new room", "players": ["' .. ARGV[2] .. '"]}'
         elseif roomInfo == '0' then
             local exist = checkPlayer(ARGV[2])
-            if exist and not ARGV[3]  then
+            if exist and ARGV[3] == 'false'  then
                 return '{"code": 104, "message":"name exists in room", "players": "null", "round": ' .. roomInfo .. '}'
             else
                 local playersString = GetPlayers()

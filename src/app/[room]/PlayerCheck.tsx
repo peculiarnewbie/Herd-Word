@@ -13,7 +13,7 @@ let ably:Ably.Types.RealtimePromise;
 
 //@ts-ignore
 export default function PlayerCheck({CreateRoom, roomId}) {
-    const playerIdFromQuery = useSearchParams()?.get('playerId')
+    const [playerIdFromQuery, setFromQuery] = useState(useSearchParams()?.get('playerId'))
     const [cookies, setCookie] = useCookies(['playerId', 'isMaster']);
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
@@ -37,17 +37,17 @@ export default function PlayerCheck({CreateRoom, roomId}) {
 
         const  CheckPlayer = async () => {
             if(cookies.isMaster) setIsMaster(true);
-            if(playerIdFromQuery){
+            if(cookies.playerId){
+                id = cookies.playerId
+                setPlayerId(id)
+                fromCookie = true;
+            }
+            else if(playerIdFromQuery){
                 console.log('get in ere')
                 id = playerIdFromQuery
                 setPlayerId(id);
                 fromCookie = false;
                 history.replaceState({}, document.title, `/${roomId}`);
-            }
-            else if(cookies.playerId){
-                id = cookies.playerId
-                setPlayerId(id)
-                fromCookie = true;
             }
             else{
                 setMessage(`input name`)
@@ -64,11 +64,14 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 if(result.code == 101){
                     if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=true`
+                    setIsMaster(true);
                     setMessage(`created room as ${id}`)
                     setJoined(true)
                 }
                 else if(result.code == 102){
                     if(!fromCookie) document.cookie = `playerId=${id}`
+                    document.cookie = `isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                    setIsMaster(true);
                     setMessage(`welcome, ${id}`)
                     setJoined(true)
                 }
@@ -129,7 +132,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
             ably.close()
         };
 
-    }, [])
+    }, [playerIdFromQuery])
 
     const AdvanceRound = async () =>{
         setLoading(true);
@@ -168,6 +171,10 @@ export default function PlayerCheck({CreateRoom, roomId}) {
         console.log(delCommand)
     }
 
+    const ChangeName = (newId:string) => {
+        
+    }
+
     if(round == 0){
         return(
             <>
@@ -175,8 +182,10 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 joined={joined} 
                 message={message} 
                 players={players} 
-                loading={loading} 
-                roomId={roomId}></RoomLobby>
+                loading={loading}
+                setLoading={setLoading} 
+                roomId={roomId}
+                setId={setFromQuery}></RoomLobby>
                 <OptionalButton show={isMaster && !loading} text="Start Game" onClick={AdvanceRound}></OptionalButton>
             </>
         )
