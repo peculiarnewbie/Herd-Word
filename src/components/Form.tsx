@@ -21,11 +21,14 @@ const FormDemo = ({playerId}) => {
   const CallCreateRoom = async (event) => {
     event.preventDefault();
     const roomId = event.target.room.value;
-    const playerId = event.target.name.value;
+    const playerIdForm = event.target.name.value;
 
-    console.log(roomId, playerId)
+    console.log(roomId, playerIdForm)
 
-    router.push(`/${roomId}?playerId=${playerId}`)
+    if(playerIdForm !== undefined)
+      router.push(`/${roomId}?playerId=${playerIdForm}`)
+    else 
+      router.push(`/${roomId}`)
   }
 
   const router = useRouter();

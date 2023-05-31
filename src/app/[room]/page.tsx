@@ -2,22 +2,18 @@
 import { cookies } from 'next/headers';
 import FormDemo from '@/components/Form';
 import PlayerCheck from './PlayerCheck';
-import {createClient} from 'redis'
 
 export default async function Page({ params }: { params: { room: string } }){
-    const playerId = cookies().get("playerId")?.value;
     const roomId = params.room;
 
     //@ts-ignore
-    const CreateRoom = async (passedRoom, passedPlayer) => {
+    const CreateRoom = async (passedRoom, passedPlayer, fromCookie) => {
         'use server';
         
         console.log("at server", passedRoom, passedPlayer);
     
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "text/plain");
-
-        const fromCookie = playerId? true : false
         
         var raw = JSON.stringify({
           "roomId": `${passedRoom}`,
@@ -39,44 +35,11 @@ export default async function Page({ params }: { params: { room: string } }){
         return JSON.parse(result).body;
       }
 
-      const CallSub = async() =>{
-        'use server';
-        
-        await SubToRedis()
-      }
-
-      //@ts-ignore
-      const SubToRedis = async() =>{
-        'use server';
-        const redisSub = createClient({
-            url: process.env.REDIS_URL
-        });
-
-        console.log("subscribing")
-
-        await redisSub.connect();
-
-        //@ts-ignore
-        await redisSub.subscribe(`herdword:${roomId}:messages`, (err, res) => {
-            if (err) {
-              console.error(err);
-            } else {
-              console.log(`Subscribed to channel ${res}`);
-            }
-        });
-
-        //@ts-ignore
-        redisSub.on('message', (channel, message) => {
-            console.log(`Received message on channel ${channel}: ${message}`);
-          });
-
-      }
-
     
 
     return(
         <>
-            <PlayerCheck CreateRoom={CreateRoom} roomId = {roomId} playerIdCookie={playerId} SubToRedis={SubToRedis}></PlayerCheck>
+            <PlayerCheck CreateRoom={CreateRoom} roomId = {roomId}></PlayerCheck>
         </>
     )
 

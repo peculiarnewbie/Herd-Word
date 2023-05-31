@@ -15,8 +15,8 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
           
-            globalChannel = ably.channels.get('herdword');
-            await globalChannel.subscribe(roomId, (message) => {
+            globalChannel = ably.channels.get(`herdword:${roomId}`);
+            await globalChannel.subscribe(':players', (message) => {
               console.log('Received a greeting message in realtime: ' + message.data)
               setPlayersArr(playersArr => [...playersArr, message.data])
             });
