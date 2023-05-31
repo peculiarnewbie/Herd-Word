@@ -64,9 +64,12 @@ export const handler = async (event, context) => {
         }
     }
 
-    if(chosenAnswers != "null"){
-        for(let i = 0; i < chosenAnswers.length; i+=2){
-            chosenArr.push(chosenAnswers[i+1]);
+    if(round == '1'){
+        if(chosenAnswers != "null"){
+            for(let i = 0; i < chosenAnswers.length; i+=2){
+                
+                chosenArr.push(chosenAnswers[i]);
+            }
         }
     }
 
@@ -74,6 +77,8 @@ export const handler = async (event, context) => {
     let JSONResponse = {round: parsed.cRound,
                         chosenAnswers: chosenArr,
                         highestAnswers: highestArr}
+
+    console.log(JSONResponse);
     
     const ably = new Ably.Realtime.Promise(process.env.HERD_ABLY_API_KEY)
     await ably.connection.once('connected');

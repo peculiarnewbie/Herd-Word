@@ -7,7 +7,7 @@ import FormButton from "@/components/FormButton";
 
 
 
-export default function PlayArea({loading, round, roomId, playerId}: {loading:boolean, round:number, roomId:string, playerId:string}){
+export default function PlayArea({loading, round, roomId, playerId, answers}: {loading:boolean, round:number, roomId:string, playerId:string, answers:any}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState('')
 
@@ -59,6 +59,7 @@ export default function PlayArea({loading, round, roomId, playerId}: {loading:bo
     if(showInput){
         return(
             <>
+                <p>{JSON.stringify(answers)}</p>
                 <Form.Root onSubmit={SendInput}>
                     <Form.Field className="FormField" name="answer">
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>

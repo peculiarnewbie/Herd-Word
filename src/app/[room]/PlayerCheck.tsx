@@ -22,6 +22,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [players, setPlayers] = useState([''])
     const [chosenAnswers, setChosenAnswers] = useState([''])
     const [highestAnswers, setHighestAnswers] = useState([''])
+    const [answers, setAnswers] = useState({})
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
     const [score, setScore] = useState(0);
@@ -112,10 +113,10 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
                 setRound(messageObj.round)
-                setChosenAnswers(messageObj.chosenAnswers);
-                setHighestAnswers(messageObj.highestAnswers)
+                setAnswers({chosen : messageObj.chosenAnswers,
+                            highest: messageObj.highestAnswers})
 
-                console.log(round, chosenAnswers, highestAnswers);
+                console.log(round, answers);
                 // ReceiveRoomAction(message.data)
             });
         }
@@ -158,6 +159,15 @@ export default function PlayerCheck({CreateRoom, roomId}) {
         return JSON.parse(result).body;
     }
 
+    const DelCommand = () => {
+        let delCommand = "DEL "
+        for(let i = 1; i < round; i++){
+            delCommand += `herdword:${roomId}:${i}:inputs herdword:${roomId}:${i}:playerinputs herdword:${roomId}:${i}:inputRank `
+        }
+
+        console.log(delCommand)
+    }
+
     if(round == 0){
         return(
             <>
@@ -174,10 +184,11 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     else{
         return(
             <>
-                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId}></PlayArea>
+                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers}></PlayArea>
                 <p>round: {round}</p>
                 <PlayerScore score={score} lone={lone}></PlayerScore>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
+                <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>
         )
     }
