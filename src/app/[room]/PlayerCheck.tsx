@@ -71,7 +71,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 else if(result.code == 102){
                     if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT`
-                    setIsMaster(true);
+                    setIsMaster(false);
                     setMessage(`welcome, ${id}`)
                     setJoined(true)
                 }
