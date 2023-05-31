@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis"
+import Ably from 'ably'
 
 const redis = new Redis({
     url: process.env.HERD_UPSTASH_REDIS_REST_URL,
@@ -49,26 +50,37 @@ export const handler = async (event, context) => {
     const parsed = JSON.parse(JSON.stringify(advanceRound));
 
     const highestAnswers = parsed.highestAnswers;
-    let highestHash = {};
-    let countedAnswers = 0;
+    let highestArr = [];
+    const chosenAnswers = parsed.chosenAnswers;
+    let chosenArr = [];
     
     if(highestAnswers != "null")
     {
         for(let i = 0; i < highestAnswers.length; i+=2){
-            highestHash[`${highestAnswers[i]}`] = highestAnswers[i + 1];
-            if(highestAnswers[i+1] = highestAnswers[1]) countedAnswers++;
+            let counts = false
+            if(highestAnswers[i+1] = highestAnswers[1]) counts = true;
+            let obj = {input: highestAnswers[i], score: highestAnswers[i + 1], counts: counts}
+            highestArr.push(obj);
         }
     }
-    
-    // const chosenAnswers = parsed.chosenAnswers;
-    // let chosenHash = {};
 
-    // if(chosenAnswers != "null")
-    // {
-    //     for(let i = 0; i < chosenAnswers.length; i+=2){
-    //         chosenHash[`${chosenAnswers[i]}`] = chosenAnswers[i + 1];
-    //     }
-    // }
+    if(chosenAnswers != "null"){
+        for(let i = 0; i < chosenAnswers.length; i+=2){
+            chosenArr.push(chosenAnswers[i+1]);
+        }
+    }
+
+
+    let JSONResponse = {cRound: parsed.cRound,
+                        chosenAnswers: chosenArr,
+                        highestAnswers: highestArr}
+    
+    const ably = new Ably.Realtime.Promise(process.env.HERD_ABLY_API_KEY)
+    await ably.connection.once('connected');
+    const channel = ably.channels.get(`herdword:${roomId}`);
+    await channel.publish(`:actions`, JSON.stringify(JSONResponse));
+    console.log("published")
+    ably.close()
 
     const response = {
         statusCode: 200,
@@ -79,9 +91,7 @@ export const handler = async (event, context) => {
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
         body: JSON.stringify(advanceRound)
-      };
+      }
 
-
-    
     return response
 }
