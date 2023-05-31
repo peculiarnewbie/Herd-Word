@@ -24,6 +24,13 @@ export const handler = async (event, context) => {
             return exist
         end
 
+        local function GetPlayers()
+            redis.call('ZADD', KEYS[2], 0, ARGV[2])
+            local players = redis.call('ZRANGE', KEYS[2], 0, -1)
+            local string = table.concat(players, '", "')
+            return string
+        end
+
         local roomInfo = redis.call('HGET', KEYS[1], ARGV[1])
 
         if not roomInfo then
@@ -35,18 +42,20 @@ export const handler = async (event, context) => {
             if exist and not ARGV[3]  then
                 return '{"code": 104, "message":"name exists in room", "players": "null"}'
             else
-                redis.call('ZADD', KEYS[2], 0, ARGV[2])
-                local players = redis.call('ZRANGE', KEYS[2], 0, -1)
-                local playersString = table.concat(players, '", "')
+                local playersString = GetPlayers()
                 
                 if exist then
                     return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"]}'
                 else
-                    redis.call('PUBLISH', KEYS[3], ARGV[2])
                     return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
                 end
             end
         else
+            local exist = checkPlayer(ARGV[2])
+            if exist then
+                local playersString = GetPlayers()
+                return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "round": ' .. roomInfo .. '}'
+            end
             --check for hot joining
             return '{"code": 105, "message":"room is playing", "players": "null"}'
         end`,
@@ -62,8 +71,8 @@ export const handler = async (event, context) => {
     {
         const ably = new Ably.Realtime.Promise(process.env.HERD_ABLY_API_KEY)
         await ably.connection.once('connected');
-        const channel = ably.channels.get('herdword');
-        await channel.publish(roomId, userId);
+        const channel = ably.channels.get(`herdword:${roomId}`);
+        await channel.publish(`:players`, userId);
         console.log("published")
         ably.close()
     }
