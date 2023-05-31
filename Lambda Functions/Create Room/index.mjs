@@ -40,14 +40,14 @@ export const handler = async (event, context) => {
         elseif roomInfo == '0' then
             local exist = checkPlayer(ARGV[2])
             if exist and not ARGV[3]  then
-                return '{"code": 104, "message":"name exists in room", "players": "null"}'
+                return '{"code": 104, "message":"name exists in room", "players": "null", "round": ' .. roomInfo .. '}'
             else
                 local playersString = GetPlayers()
                 
                 if exist then
-                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"]}'
+                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "round": ' .. roomInfo .. '}'
                 else
-                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"]}'
+                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"], "round": ' .. roomInfo .. '}'
                 end
             end
         else
@@ -57,7 +57,7 @@ export const handler = async (event, context) => {
                 return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "round": ' .. roomInfo .. '}'
             end
             --check for hot joining
-            return '{"code": 105, "message":"room is playing", "players": "null"}'
+            return '{"code": 105, "message":"room is playing", "players": "null", "round": ' .. roomInfo .. '}'
         end`,
         keys,
         args

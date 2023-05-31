@@ -4,8 +4,11 @@ import { useEffect, useState } from "react"
 import RoomLobby from "./RoomLobby"
 import Ably from 'ably'
 import { useCookies } from 'react-cookie';
+import PlayerScore from "./PlayerScore";
+import PlayArea from "./PlayArea"
 
 let gameChannel:Ably.Types.RealtimeChannelPromise;
+let ably:Ably.Types.RealtimePromise;
 
 //@ts-ignore
 export default function PlayerCheck({CreateRoom, roomId}) {
@@ -16,7 +19,12 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [joined, setJoined] = useState(true)
     const [loading, setLoading] = useState(true)
     const [players, setPlayers] = useState([''])
+    const [chosenAnswers, setChosenAnswers] = useState([''])
+    const [highestAnswers, setHighestAnswers] = useState([''])
     const [round, setRound] = useState(0);
+    const [score, setScore] = useState(0);
+    const [lone, setLone] = useState(0);
+    const [playersWScores, setPlayersWScores] = useState({})
     let fromCookie = false;
     let playerId = ""
 
@@ -57,6 +65,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 }
                 else if(result.code == 103){
                     setMessage(`welcome back, ${playerId}`)
+                    setRound(result.round)
                     setJoined(true)
                 }
                 else if(result.code == 104){
@@ -83,13 +92,21 @@ export default function PlayerCheck({CreateRoom, roomId}) {
         }
 
         const  ConnectToAbly = async () => {
-            const ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
+            ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
             
             gameChannel = ably.channels.get(`herdword:${roomId}`);
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
+                const messageObj = JSON.parse(message.data);
+                setRound(messageObj.round)
+                setChosenAnswers(messageObj.chosenAnswers);
+                setHighestAnswers(messageObj.highestAnswers)
+
+                console.log(messageObj, messageObj.round, messageObj.chosenAnswers);
+                console.log(round, chosenAnswers, highestAnswers);
+                // ReceiveRoomAction(message.data)
             });
         }
           
@@ -98,15 +115,32 @@ export default function PlayerCheck({CreateRoom, roomId}) {
 
         return () => {
             gameChannel.detach();
+            ably.close()
         };
 
     }, [])
-    return(
-        <RoomLobby
-        joined={joined} 
-        message={message} 
-        players={players} 
-        loading={loading} 
-        roomId={roomId}></RoomLobby>
-    )
+
+    if(round == 0){
+        return(
+            <RoomLobby
+            joined={joined} 
+            message={message} 
+            players={players} 
+            loading={loading} 
+            roomId={roomId}></RoomLobby>
+        )
+    }
+    else{
+        return(
+            <>
+                <PlayArea loading={loading} ></PlayArea>
+                <p>round: {round}</p>
+                <PlayerScore score={score} lone={lone}></PlayerScore>
+            </>
+        )
+    }
+
+    function ReceiveRoomAction({message}: {message:string}){
+        
+    }
 }

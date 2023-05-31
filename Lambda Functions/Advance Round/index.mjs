@@ -71,7 +71,7 @@ export const handler = async (event, context) => {
     }
 
 
-    let JSONResponse = {cRound: parsed.cRound,
+    let JSONResponse = {round: parsed.cRound,
                         chosenAnswers: chosenArr,
                         highestAnswers: highestArr}
     
@@ -90,7 +90,7 @@ export const handler = async (event, context) => {
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
-        body: JSON.stringify(advanceRound)
+        body: JSON.stringify(JSONResponse)
       }
 
     return response

@@ -4,6 +4,7 @@ import './styles.css';
 import Ably from 'ably'
 
 let globalChannel:Ably.Types.RealtimeChannelPromise;
+let ably:Ably.Types.RealtimePromise;
 
 export default function PlayerList({players, roomId}: {players:string[], roomId:string}){
     const [playersArr, setPlayersArr] = useState(['']);
@@ -11,7 +12,7 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
     useEffect(() => {
         setPlayersArr(players);
         const  ConnectToAbly = async () => {
-            const ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
+            ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
           
@@ -24,9 +25,10 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
           
           ConnectToAbly()
       
-          return () => {
+        return () => {
             globalChannel.detach();
-            };
+            ably.close()
+        };  
             
     }, [])
 
