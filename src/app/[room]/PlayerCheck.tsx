@@ -28,46 +28,51 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [lone, setLone] = useState(0);
     const [playersWScores, setPlayersWScores] = useState({})
     let fromCookie = false;
-    let playerId = ""
+    const [playerId, setPlayerId] = useState('');
+    let id = ''
 
     useEffect(() => {
-        if(cookies.isMaster) setIsMaster(true);
-        if(playerIdFromQuery){
-            console.log('get in ere')
-            playerId = playerIdFromQuery? playerIdFromQuery : "null";
-            fromCookie = false;
-            history.replaceState({}, document.title, `/${roomId}`);
-        }
-        else if(cookies.playerId){
-            playerId = cookies.playerId
-            fromCookie = true;
-        }
-        else{
-            setMessage(`input name`)
-            setJoined(false)
-            setLoading(false);
-            return;
-        }
-        console.log(playerId, roomId, fromCookie);
+        
 
         const  CheckPlayer = async () => {
-            if(playerId){
-                const result = await CreateRoom(roomId, playerId, fromCookie);
+            if(cookies.isMaster) setIsMaster(true);
+            if(playerIdFromQuery){
+                console.log('get in ere')
+                id = playerIdFromQuery
+                setPlayerId(id);
+                fromCookie = false;
+                history.replaceState({}, document.title, `/${roomId}`);
+            }
+            else if(cookies.playerId){
+                id = cookies.playerId
+                setPlayerId(id)
+                fromCookie = true;
+            }
+            else{
+                setMessage(`input name`)
+                setJoined(false)
+                setLoading(false);
+                return;
+            }
+            console.log(id, roomId, fromCookie);
+
+            if(id){
+                const result = await CreateRoom(roomId, id, fromCookie);
                 console.log(result)
 
                 if(result.code == 101){
-                    if(!fromCookie) document.cookie = `playerId=${playerId}`
+                    if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=true`
-                    setMessage(`created room as ${playerId}`)
+                    setMessage(`created room as ${id}`)
                     setJoined(true)
                 }
                 else if(result.code == 102){
-                    if(!fromCookie) document.cookie = `playerId=${playerId}`
-                    setMessage(`welcome, ${playerId}`)
+                    if(!fromCookie) document.cookie = `playerId=${id}`
+                    setMessage(`welcome, ${id}`)
                     setJoined(true)
                 }
                 else if(result.code == 103){
-                    setMessage(`welcome back, ${playerId}`)
+                    setMessage(`welcome back, ${id}`)
                     setRound(result.round)
                     setJoined(true)
                 }
@@ -91,6 +96,9 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 setPlayers(result.players)
                 console.log(message);
             }
+            else{
+                setMessage(`sht broke`)
+            }
             setLoading(false)
         }
 
@@ -107,7 +115,6 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 setChosenAnswers(messageObj.chosenAnswers);
                 setHighestAnswers(messageObj.highestAnswers)
 
-                console.log(messageObj, messageObj.round, messageObj.chosenAnswers);
                 console.log(round, chosenAnswers, highestAnswers);
                 // ReceiveRoomAction(message.data)
             });
@@ -167,14 +174,11 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     else{
         return(
             <>
-                <PlayArea loading={loading} ></PlayArea>
+                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId}></PlayArea>
                 <p>round: {round}</p>
                 <PlayerScore score={score} lone={lone}></PlayerScore>
+                <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
             </>
         )
-    }
-
-    function ReceiveRoomAction({message}: {message:string}){
-        
     }
 }
