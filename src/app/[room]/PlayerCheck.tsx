@@ -6,6 +6,7 @@ import Ably from 'ably'
 import { useCookies } from 'react-cookie';
 import PlayerScore from "./PlayerScore";
 import PlayArea from "./PlayArea"
+import OptionalButton from "./OptionalButton"
 
 let gameChannel:Ably.Types.RealtimeChannelPromise;
 let ably:Ably.Types.RealtimePromise;
@@ -13,7 +14,7 @@ let ably:Ably.Types.RealtimePromise;
 //@ts-ignore
 export default function PlayerCheck({CreateRoom, roomId}) {
     const playerIdFromQuery = useSearchParams()?.get('playerId')
-    const [cookies, setCookie] = useCookies(['playerId']);
+    const [cookies, setCookie] = useCookies(['playerId', 'isMaster']);
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
     const [joined, setJoined] = useState(true)
@@ -21,6 +22,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [players, setPlayers] = useState([''])
     const [chosenAnswers, setChosenAnswers] = useState([''])
     const [highestAnswers, setHighestAnswers] = useState([''])
+    const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
     const [score, setScore] = useState(0);
     const [lone, setLone] = useState(0);
@@ -29,6 +31,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     let playerId = ""
 
     useEffect(() => {
+        if(cookies.isMaster) setIsMaster(true);
         if(playerIdFromQuery){
             console.log('get in ere')
             playerId = playerIdFromQuery? playerIdFromQuery : "null";
@@ -120,14 +123,45 @@ export default function PlayerCheck({CreateRoom, roomId}) {
 
     }, [])
 
+    const AdvanceRound = async () =>{
+        setLoading(true);
+        console.log("advancing round");
+    
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "text/plain");
+        
+        var raw = JSON.stringify({
+          "roomId": `${roomId}`,
+          "round": `${round}`
+        });
+        
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          next: { revalidate: 0 }
+        };
+        
+        //@ts-ignore
+        const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/roomactions/advanceround", requestOptions)
+          .then(response => response.text())
+
+        setLoading(false);
+    
+        return JSON.parse(result).body;
+    }
+
     if(round == 0){
         return(
-            <RoomLobby
-            joined={joined} 
-            message={message} 
-            players={players} 
-            loading={loading} 
-            roomId={roomId}></RoomLobby>
+            <>
+                <RoomLobby
+                joined={joined} 
+                message={message} 
+                players={players} 
+                loading={loading} 
+                roomId={roomId}></RoomLobby>
+                <OptionalButton show={isMaster && !loading} text="Start Game" onClick={AdvanceRound}></OptionalButton>
+            </>
         )
     }
     else{
