@@ -25,9 +25,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [answers, setAnswers] = useState({})
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
-    const [score, setScore] = useState(0);
-    const [lone, setLone] = useState(0);
-    const [playersWScores, setPlayersWScores] = useState({})
+    const [playersWScores, setPlayersWScores] = useState([])
     let fromCookie = false;
     const [playerId, setPlayerId] = useState('');
     let id = ''
@@ -117,7 +115,9 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 const messageObj = JSON.parse(message.data);
                 setRound(messageObj.round)
                 setAnswers({chosen : messageObj.chosenAnswers,
-                            highest: messageObj.highestAnswers})
+                            highest: messageObj.highestAnswers,
+                            lone: messageObj.loneAnswers})
+                setPlayersWScores(messageObj.playerScores)
 
                 console.log(round, answers);
                 // ReceiveRoomAction(message.data)
@@ -164,6 +164,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
 
     const DelCommand = () => {
         let delCommand = "DEL "
+        delCommand += `herdword:${roomId} herdword:${roomId}:players herdword:${roomId}:lonest `
         for(let i = 1; i < round; i++){
             delCommand += `herdword:${roomId}:${i}:inputs herdword:${roomId}:${i}:playerinputs herdword:${roomId}:${i}:inputRank `
         }
@@ -193,9 +194,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     else{
         return(
             <>
-                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers}></PlayArea>
-                <p>round: {round}</p>
-                <PlayerScore score={score} lone={lone}></PlayerScore>
+                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>
