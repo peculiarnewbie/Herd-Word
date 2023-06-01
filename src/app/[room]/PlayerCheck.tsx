@@ -22,10 +22,10 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [players, setPlayers] = useState([''])
     const [chosenAnswers, setChosenAnswers] = useState([''])
     const [highestAnswers, setHighestAnswers] = useState([''])
-    const [answers, setAnswers] = useState({})
+    const [answers, setAnswers] = useState({chosen: [], highest: [], lone: []})
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
-    const [playersWScores, setPlayersWScores] = useState([])
+    const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     let fromCookie = false;
     const [playerId, setPlayerId] = useState('');
     let id = ''

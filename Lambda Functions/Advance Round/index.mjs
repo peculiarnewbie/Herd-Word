@@ -96,7 +96,7 @@ export const handler = async (event, context) => {
             let pipe = redis.pipeline()
     
             for(let i = 0; i < 4; i++){
-                if(answersArr[i].highest){
+                if(answersArr[i]?.highest){
                     const winners = await redis.zrange(keys[2], answersArr[i].inputId, answersArr[i].inputId, {byScore: true})
                     pointWinner = [...pointWinner, ...winners]
                 }
@@ -156,7 +156,7 @@ export const handler = async (event, context) => {
             //choose next promt
             if(lowestArr.length > 2){
                 const min = 0;
-                const max = lowestArr.length;
+                const max = lowestArr.length - 1;
                 const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
                 let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
                 while(randomInt1 == randomInt2) randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;

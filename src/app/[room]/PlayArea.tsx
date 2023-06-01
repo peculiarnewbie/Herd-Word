@@ -4,6 +4,7 @@ import * as Form from '@radix-ui/react-form';
 import { useEffect, useState } from "react";
 import FormButton from "@/components/FormButton";
 import PlayerScore from "./PlayerScore";
+import RoundResults from "./RoundResults";
 
 
 
@@ -17,14 +18,28 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     const[loneScore, setLoneScore] = useState(0);
 
     useEffect(() => {
-        for(let i = 0; i < answers.highest.length; i++)
-        {
-            let obj = answers.highest[i]
-            if(obj.highest){
-                if(inputId == obj.inputId) setScore(score + 1)
+        console.log("id before score:", inputId);
+        // for(let i = 0; i < answers.highest.length; i++)
+        // {
+        //     let obj = answers.highest[i]
+        //     if(obj.highest){
+        //         if(inputId == obj.inputId) setScore(score + 1)
+        //     }
+        //     else break;
+        // }
+
+        if(round > 1){
+            for(let i = 0; i < answers?.highest?.length; i++){
+                if(inputId == answers.highest[i].inputId) {
+                    if(answers.highest[i].highest) setScore(score + 1)
+                };
             }
-            else break;
+    
+            for(let i = 0; i < answers?.lone?.length; i++){
+                if(inputId == answers.lone[i].inputId) setLoneScore(loneScore + 1);
+            }
         }
+
         
         setShowInput(true);
     }, [round])
@@ -61,8 +76,10 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
 
         
         setConfirmedInput(input);
+
+        console.log(JSON.parse(result).body)
     
-        setInputId(JSON.parse(result).body);
+        setInputId(JSON.parse(result).body.inputId);
     }
 
     if(loading){
@@ -74,9 +91,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     if(showInput){
         return(
             <>
-                <p>chosen: {JSON.stringify(answers.chosen)}</p>
-                <p>highest: {JSON.stringify(answers.highest)}</p>
-                <p>scores: {JSON.stringify(playersWScores)}</p>
+                <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
                 <Form.Root onSubmit={SendInput}>
                     <Form.Field className="FormField" name="answer">
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
