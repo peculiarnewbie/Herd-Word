@@ -60,6 +60,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 console.log(result)
 
                 if(result.code == 101){
+                    await SubToAblyActions()
                     if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=true`
                     setIsMaster(true);
@@ -67,6 +68,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                     setJoined(true)
                 }
                 else if(result.code == 102){
+                    await SubToAblyActions()
                     if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT`
                     setIsMaster(false);
@@ -74,6 +76,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                     setJoined(true)
                 }
                 else if(result.code == 103){
+                    await SubToAblyActions()
                     setMessage(`welcome back, ${id}`)
                     setRound(result.round)
                     setJoined(true)
@@ -104,12 +107,15 @@ export default function PlayerCheck({CreateRoom, roomId}) {
             setLoading(false)
         }
 
-        const  ConnectToAbly = async () => {
+        const ConnectToAbly  = async () => {
             ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
             
             gameChannel = ably.channels.get(`herdword:${roomId}`);
+        }
+
+        const SubToAblyActions = async () => {
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
@@ -123,7 +129,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 // ReceiveRoomAction(message.data)
             });
         }
-          
+
         ConnectToAbly()
         CheckPlayer()
 
