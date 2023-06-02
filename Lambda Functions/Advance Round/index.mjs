@@ -28,7 +28,7 @@ export const handler = async (event, context) => {
         local answers = redis.call('HGETALL', KEYS[2])
         local answersString = table.concat(answers, '", "')
 
-        local playerInputs = redis.call('ZREVRANGE', KEYS[3], '0', '-1', 'WITHSCORES')
+        local playerInputs = redis.call('ZRANGE', KEYS[3], '0', '-1', 'WITHSCORES')
         local playersString = table.concat(playerInputs, '", "')
 
         if ARGV[1] == '0' then
@@ -60,14 +60,14 @@ export const handler = async (event, context) => {
     
     if(rankedAnswers != 'null'){
         for(let i = 0; i < answers.length; i+=2){
-            answersFlat.push(answers[i]);
+            answersFlat.push({input: answers[i], inputId: answers[i+1]});
         }
         for(let i = 0; i < playerInputs.length; i+=2){
             playerInputsArr.push({playerId: playerInputs[i], inputId: playerInputs[i+1]})
         }
         for(let i = 0; i < rankedAnswers.length; i+=2){
-            let obj = {inputId: rankedAnswers[i], input:answersFlat[rankedAnswers[i]] , score: rankedAnswers[i + 1], highest: false}
-            if(rankedAnswers[i+1] == rankedAnswers[1]) obj.highest = true;
+            let obj = {inputId: rankedAnswers[i], input: answersFlat.find(s => s.inputId === rankedAnswers[i]).input , score: rankedAnswers[i + 1], highest: false}
+            if(rankedAnswers[i+1] == rankedAnswers[1] && rankedAnswers[1] > 1) obj.highest = true;
             if(rankedAnswers[i+1] == 1) lowestArr.push(obj);
             answersArr.push(obj);
         }
@@ -85,9 +85,12 @@ export const handler = async (event, context) => {
                 if(max == 1) break;
                 randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
             } 
+
+            let chosen1 = playerInputsArr[randomInt1]
+            let chosen2 = playerInputsArr[randomInt2]
             
-            chosenArr.push({playerId: playerInputsArr[randomInt1].playerId, input: answersArr[playerInputsArr[randomInt1].inputId].input},
-                            {playerId: playerInputsArr[randomInt2].playerId, input: answersArr[playerInputsArr[randomInt2].inputId].input})
+            chosenArr.push({playerId: chosen1.playerId, input: answersArr.find(s => s.inputId == chosen1.inputId).input},
+                            {playerId: chosen2.playerId, input: answersArr.find(s => s.inputId == chosen2.inputId).input})
         }
         else{
 
