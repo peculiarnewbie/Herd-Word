@@ -8,6 +8,7 @@ import PlayerScore from "./PlayerScore";
 import PlayArea from "./PlayArea"
 import OptionalButton from "./OptionalButton"
 
+
 let gameChannel:Ably.Types.RealtimeChannelPromise;
 let ably:Ably.Types.RealtimePromise;
 
@@ -25,10 +26,19 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [answers, setAnswers] = useState({chosen: [], highest: [], lone: []})
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
+    const [roomInfo, setRoomInfo] = useState({})
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     let fromCookie = false;
     const [playerId, setPlayerId] = useState('');
     let id = ''
+
+    useEffect(() => {
+        const DoShtForMaster = async () =>{
+
+        }
+
+        DoShtForMaster()
+    }, [isMaster])
 
     useEffect(() => {
         
@@ -78,7 +88,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                 else if(result.code == 103){
                     await SubToAblyActions()
                     setMessage(`welcome back, ${id}`)
-                    setRound(result.round)
+                    setRound(result.roomInfo.round)
                     setJoined(true)
                 }
                 else if(result.code == 104){
@@ -112,23 +122,24 @@ export default function PlayerCheck({CreateRoom, roomId}) {
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
             
-            gameChannel = ably.channels.get(`herdword:${roomId}`);
+            gameChannel = ably.channels.get(`[?rewind=1]herdword:${roomId}`);
         }
 
         const SubToAblyActions = async () => {
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
-                setRound(messageObj.round)
+                setRound(messageObj.round);
                 setAnswers({chosen : messageObj.chosenAnswers,
                             highest: messageObj.highestAnswers,
-                            lone: messageObj.loneAnswers})
-                setPlayersWScores(messageObj.playerScores)
+                            lone: messageObj.loneAnswers});
+                setPlayersWScores(messageObj.playerScores);
 
                 console.log(round, answers);
                 // ReceiveRoomAction(message.data)
             });
         }
+
 
         ConnectToAbly()
         CheckPlayer()

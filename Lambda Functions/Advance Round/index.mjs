@@ -23,7 +23,7 @@ export const handler = async (event, context) => {
 
     const advanceRound = await redis.eval(
         `
-        local currentRound = redis.call('HINCRBY', KEYS[1], 'cRound', 1)
+        local currentRound = redis.call('HINCRBY', KEYS[1], 'round', 1)
         
         local answers = redis.call('HGETALL', KEYS[2])
         local answersString = table.concat(answers, '", "')
@@ -32,11 +32,11 @@ export const handler = async (event, context) => {
         local playersString = table.concat(playerInputs, '", "')
 
         if ARGV[1] == '0' then
-        return '{"cRound": ' .. currentRound .. ', "answers": "null", "rankedAnswers": "null"}'
+        return '{"round": ' .. currentRound .. ', "answers": "null", "rankedAnswers": "null"}'
         else
             local highestAnswers = redis.call('ZREVRANGE', KEYS[4], '0', '-1', 'WITHSCORES')
             local highestString = table.concat(highestAnswers, '", "')
-            return '{"cRound": ' .. currentRound .. ', "answers": ["' .. answersString .. '"], "rankedAnswers": ["' .. highestString .. '"], "playerInputs": ["' .. playersString .. '"]}'
+            return '{"round": ' .. currentRound .. ', "answers": ["' .. answersString .. '"], "rankedAnswers": ["' .. highestString .. '"], "playerInputs": ["' .. playersString .. '"]}'
         end`,
         keys,
         args
@@ -182,7 +182,7 @@ export const handler = async (event, context) => {
 
 
 
-    let JSONResponse = {round: parsed.cRound,
+    let JSONResponse = {round: parsed.round,
                         chosenAnswers: chosenArr,
                         highestAnswers: top5Arr,
                         loneAnswers: lowestArr,

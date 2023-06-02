@@ -15,9 +15,9 @@ export const handler = async (event, context) => {
     console.log({roomId, userId, fromCookie})
 
     const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`, `herdword:${roomId}:messages`];
-	const args = [`${roomId}`, `${userId}`, fromCookie, ]
+	const args = ["round", `${userId}`, fromCookie]
 
-    const createRoom = await redis.eval(
+    const joinRoom = await redis.eval(
         `
         local function checkPlayer(name)
             local exist = redis.call('ZSCORE', KEYS[2], name)
@@ -31,41 +31,50 @@ export const handler = async (event, context) => {
             return string
         end
 
-        local roomRound = redis.call('HGET', KEYS[1], 'round')
+        local currentRound = redis.call('HGET', KEYS[1], 'round')
+        local roomInfo = redis.call('HGETALL', KEYS[1])
+        local roomInfoString = table.concat(roomInfo, '", "')
 
-        if not roomRound then
-            redis.call('HSET', KEYS[1], "id", ARGV[1], "round", 0)
-            redis.call('ZADD', KEYS[2], 0, ARGV[2])
-            return '{"code": 101, "message": "created new room", "players": ["' .. ARGV[2] .. '"]}'
-        elseif roomRound == '0' then
+        if not currentRound then
+            return '{"code": 101, "message": "create room", "players": ["' .. ARGV[2] .. '"]}'
+        elseif currentRound == '0' then
             local exist = checkPlayer(ARGV[2])
             if exist and ARGV[3] == 'false'  then
-                return '{"code": 104, "message":"name exists in room", "players": "null", "round": ' .. roomRound .. '}'
+                return '{"code": 104, "message":"name exists in room", "players": "null", "roomInfo": ["' .. roomInfoString .. '"]}'
             else
                 local playersString = GetPlayers()
                 
                 if exist then
-                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "round": ' .. roomRound .. '}'
+                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
                 else
-                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"], "round": ' .. roomRound .. '}'
+                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
                 end
             end
         else
             local exist = checkPlayer(ARGV[2])
-            if exist then
+            if exist and ARGV[3] == 'true' then
                 local playersString = GetPlayers()
-                return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "round": ' .. roomRound .. '}'
+                return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
+            else
+                --check for hot joining
+                return '{"code": 105, "message":"room is playing", "players": "null", "roomInfo": ["' .. roomInfoString .. '"]}'
             end
-            --check for hot joining
-            return '{"code": 105, "message":"room is playing", "players": "null", "round": ' .. roomRound .. '}'
         end`,
         keys,
         args
     );
 
-    console.log("we here", createRoom);
+    console.log("we here", joinRoom);
 
-    const parsed = JSON.parse(JSON.stringify(createRoom));
+    let parsed = JSON.parse(JSON.stringify(joinRoom));
+
+    let roomInfo = {}
+
+    for(let i = 0; i < parsed.roomInfo.length; i += 2){
+        roomInfo[parsed.roomInfo[i]] = parsed.roomInfo[i+1]
+    }
+
+    parsed.roomInfo = roomInfo
 
     if(parsed.code == 102)
     {
@@ -85,7 +94,7 @@ export const handler = async (event, context) => {
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
-        body: createRoom
+        body: joinRoom
       };
 
 
