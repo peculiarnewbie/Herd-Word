@@ -103,7 +103,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                         <Form.Control asChild>
                         <input className="Input" required />
                         </Form.Control>
-                        <FormButton withButton={true}></FormButton>
+                        <FormButton withButton={true} label="Continue"></FormButton>
                     </Form.Field>
                 </Form.Root>
 

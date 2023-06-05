@@ -27,7 +27,7 @@ export default function HomeNameField({playerId, setPlayerId}){
     }
     else {
         return(
-            <NameField withButton={false}></NameField>
+            <NameField withButton={false} label='name' message='Please enter your name'></NameField>
         )
     }
 }

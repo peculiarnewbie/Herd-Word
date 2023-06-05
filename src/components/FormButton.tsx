@@ -1,11 +1,11 @@
 import * as Form from '@radix-ui/react-form';
 
-export default function FormButton({withButton} : {withButton:boolean}){
+export default function FormButton({withButton, label} : {withButton:boolean, label:string}){
     if(withButton){
         return(
             <Form.Submit asChild>
                 <button className="Button" style={{ marginTop: 10 }}>
-                Continue
+                {label}
                 </button>
             </Form.Submit>
         )

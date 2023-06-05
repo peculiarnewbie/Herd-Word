@@ -41,7 +41,7 @@ export default function RoomLobby({loading, joined, message, players, roomId, se
             <>
                 <p>{message}</p>
                 <Form.Root className="FormRoot" onSubmit={CallCreateRoom}>
-                    <NameField withButton={true}></NameField>
+                    <NameField withButton={true} label="Name" message="Please enter your name"></NameField>
                 </Form.Root>
             </>
         )
