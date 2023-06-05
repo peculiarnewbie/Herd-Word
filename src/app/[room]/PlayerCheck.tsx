@@ -7,13 +7,14 @@ import { useCookies } from 'react-cookie';
 import PlayerScore from "./PlayerScore";
 import PlayArea from "./PlayArea"
 import OptionalButton from "./OptionalButton"
+import CreateRoom from "./CreateRoom"
 
 
 let gameChannel:Ably.Types.RealtimeChannelPromise;
 let ably:Ably.Types.RealtimePromise;
 
 //@ts-ignore
-export default function PlayerCheck({CreateRoom, roomId}) {
+export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playerIdFromQuery, setFromQuery] = useState(useSearchParams()?.get('playerId'))
     const [cookies, setCookie] = useCookies(['playerId', 'isMaster']);
     // const [playerId, setPlayerId] = useState("")
@@ -24,6 +25,7 @@ export default function PlayerCheck({CreateRoom, roomId}) {
     const [chosenAnswers, setChosenAnswers] = useState([''])
     const [highestAnswers, setHighestAnswers] = useState([''])
     const [answers, setAnswers] = useState({chosen: [], highest: [], lone: []})
+    const [creatingRoom, setCreatingRoom] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
     const [roomInfo, setRoomInfo] = useState({})
@@ -66,16 +68,16 @@ export default function PlayerCheck({CreateRoom, roomId}) {
             console.log(id, roomId, fromCookie);
 
             if(id){
-                const result = await CreateRoom(roomId, id, fromCookie);
-                console.log(result)
+                const result = JSON.parse(await CallCreateRoom(roomId, id, fromCookie));
 
                 if(result.code == 101){
                     await SubToAblyActions()
                     if(!fromCookie) document.cookie = `playerId=${id}`
                     document.cookie = `isMaster=true`
-                    setIsMaster(true);
-                    setMessage(`created room as ${id}`)
-                    setJoined(true)
+                    setCreatingRoom(true);
+                    // setIsMaster(true);
+                    setMessage(`create a room`)
+                    // setJoined(true)
                 }
                 else if(result.code == 102){
                     await SubToAblyActions()
@@ -103,7 +105,8 @@ export default function PlayerCheck({CreateRoom, roomId}) {
                     return;
                 }
                 else{
-                    setMessage(`sht broke`)
+                    setMessage(`what's this code then`)
+                    console.log(result.code);
                     setJoined(false)
                     setLoading(false)
                     return;
@@ -191,6 +194,14 @@ export default function PlayerCheck({CreateRoom, roomId}) {
 
     const ChangeName = (newId:string) => {
         
+    }
+
+    if(creatingRoom){
+        return(
+            <>
+                <CreateRoom roomId={roomId} playerId={playerId}></CreateRoom>
+            </>
+        )
     }
 
     if(round == 0){

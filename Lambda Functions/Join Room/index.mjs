@@ -36,7 +36,7 @@ export const handler = async (event, context) => {
         local roomInfoString = table.concat(roomInfo, '", "')
 
         if not currentRound then
-            return '{"code": 101, "message": "create room", "players": ["' .. ARGV[2] .. '"]}'
+            return '{"code": 101, "message": "create room", "players": ["' .. ARGV[2] .. '"], "roomInfo": [""]}'
         elseif currentRound == '0' then
             local exist = checkPlayer(ARGV[2])
             if exist and ARGV[3] == 'false'  then
@@ -94,7 +94,7 @@ export const handler = async (event, context) => {
             'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
-        body: joinRoom
+        body: JSON.stringify(parsed)
       };
 
 

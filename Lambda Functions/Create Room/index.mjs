@@ -10,12 +10,13 @@ const redis = new Redis({
 export const handler = async (event, context) => {
     const roomId = event.roomId;
     const userId = event.userId;
-    const fromCookie = event.fromCookie
+    const hotJoin = event.hotJoin;
+    const params = event.params;
     
-    console.log({roomId, userId, fromCookie})
+    console.log({roomId, userId, params})
 
-    const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`, `herdword:${roomId}:messages`];
-	const args = [`${roomId}`, `${userId}`, fromCookie, ]
+    const keys = [`herdword:${roomId}`, `herdword:${roomId}:players`];
+	const args = [`${roomId}`, `${userId}`, hotJoin, params ]
 
     const createRoom = await redis.eval(
         `

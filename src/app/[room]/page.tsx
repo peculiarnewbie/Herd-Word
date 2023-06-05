@@ -98,7 +98,7 @@ export default async function Page({ params }: { params: { room: string } }){
 
     return(
         <>
-            <PlayerCheck CreateRoom={JoinRoom} roomId = {roomId}></PlayerCheck>
+            <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId}></PlayerCheck>
         </>
     )
 

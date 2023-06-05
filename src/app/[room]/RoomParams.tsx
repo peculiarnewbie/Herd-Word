@@ -1,0 +1,183 @@
+import { useState, forwardRef } from "react";
+import * as Select from '@radix-ui/react-select';
+import * as Checkbox from '@radix-ui/react-checkbox';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
+import './styles.css';
+
+const gameTypes = {'0':'Default Herd',
+                    '1': 'Custom Herd',
+                    '2': 'Default SB Elimination',
+                    '3': 'Default SB Treshold',
+                    '4': 'Custom SB'}
+
+const herdEndConditions = {'0':'Default',
+                            '1': 'Target Score',
+                            '2': 'Rounds Played'}
+            
+
+export default function RoomParams(){
+    const [gameType, setGameType] = useState('0');
+    const [onlyHighest, setOnlyHighest] = useState(true);
+
+    const [herdEnds, setHerdEnds] = useState('0');
+
+    const HandleOnlyHighest = (event:any) => {
+        setOnlyHighest(!onlyHighest)
+    }
+
+    return(
+        <>
+            <label className="Label" htmlFor="c1">
+                Game Type:
+            </label>
+            <Select.Root value={gameTypes['0']} onValueChange={setGameType}>
+                <Select.Trigger className="SelectTrigger" aria-label="Type">
+                <Select.Value placeholder="Select a game type">
+                    {/* @ts-ignore */}
+                    {gameTypes[gameType]}
+                </Select.Value>
+                <Select.Icon className="SelectIcon">
+                    <ChevronDownIcon />
+                </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                <Select.Content className="SelectContent">
+                <Select.ScrollUpButton className="SelectScrollButton">
+                    <ChevronUpIcon />
+                </Select.ScrollUpButton>
+                <Select.Viewport className="SelectViewport">
+                <Select.Group>
+                <Select.Label className="SelectLabel">Herd Mentality</Select.Label>
+                <Select.Item className={'SelectItem'} value="0">
+                    <Select.ItemText>Default</Select.ItemText>
+                    <Select.ItemIndicator className="SelectItemIndicator">
+                    <CheckIcon />
+                    </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item className={'SelectItem'} value="1" >
+                    <Select.ItemText>Custom</Select.ItemText>
+                    <Select.ItemIndicator className="SelectItemIndicator">
+                    <CheckIcon />
+                    </Select.ItemIndicator>
+                </Select.Item>
+                </Select.Group>
+                <Select.Separator className="SelectSeparator" />
+                <Select.Group>
+                <Select.Label className="SelectLabel">Same Brain</Select.Label>
+                <Select.Item className={'SelectItem'} value="2" >
+                    <Select.ItemText>Default Elimination</Select.ItemText>
+                    <Select.ItemIndicator className="SelectItemIndicator">
+                    <CheckIcon />
+                    </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item className={'SelectItem'} value="3" >
+                    <Select.ItemText>Default Treshold</Select.ItemText>
+                    <Select.ItemIndicator className="SelectItemIndicator">
+                    <CheckIcon />
+                    </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item className={'SelectItem'} value="4" >
+                    <Select.ItemText>Custom</Select.ItemText>
+                    <Select.ItemIndicator className="SelectItemIndicator">
+                    <CheckIcon />
+                    </Select.ItemIndicator>
+                </Select.Item>
+                </Select.Group>
+                </Select.Viewport>
+                <Select.ScrollDownButton className="SelectScrollButton">
+                    <ChevronDownIcon />
+                </Select.ScrollDownButton>
+                </Select.Content>
+                </Select.Portal>
+            </Select.Root>
+            <GameParams></GameParams>
+        </>
+    )
+    
+    
+    function GameParams(){
+        if(gameType == '0'){
+            return(
+                <>
+                    <p>Playing Herd Game with Default Parameters</p>
+                </>
+            )
+
+        }
+        else if(gameType == '1'){
+            return(
+                <div className="GameParams">
+                    <p>Choose Parameters</p>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label className="Label" htmlFor="c1">
+                        End of game condition:
+                    </label>
+                    <Select.Root value={herdEndConditions['0']} onValueChange={setHerdEnds}>
+                        <Select.Trigger className="SelectTrigger" aria-label="Type">
+                        <Select.Value placeholder="Select a game type">
+                            {/* @ts-ignore */}
+                            {herdEndConditions[herdEnds]}
+                        </Select.Value>
+                        <Select.Icon className="SelectIcon">
+                            <ChevronDownIcon />
+                        </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                        <Select.Content className="SelectContent">
+                        <Select.Viewport className="SelectViewport">
+                        <Select.Item className={'SelectItem'} value="0">
+                            <Select.ItemText>Default</Select.ItemText>
+                            <Select.ItemIndicator className="SelectItemIndicator">
+                            <CheckIcon />
+                            </Select.ItemIndicator>
+                        </Select.Item>
+                        <Select.Item className={'SelectItem'} value="1">
+                            <Select.ItemText>Target Score</Select.ItemText>
+                            <Select.ItemIndicator className="SelectItemIndicator">
+                            <CheckIcon />
+                            </Select.ItemIndicator>
+                        </Select.Item>
+                        <Select.Item className={'SelectItem'} value="2" >
+                            <Select.ItemText>Rounds Played</Select.ItemText>
+                            <Select.ItemIndicator className="SelectItemIndicator">
+                            <CheckIcon />
+                            </Select.ItemIndicator>
+                        </Select.Item>
+                        </Select.Viewport>
+                        </Select.Content>
+                        </Select.Portal>
+                    </Select.Root>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Checkbox.Root className="CheckboxRoot" defaultChecked id="c1" checked={onlyHighest} onCheckedChange={HandleOnlyHighest}>
+                    <Checkbox.Indicator className="CheckboxIndicator">
+                        <CheckIcon />
+                    </Checkbox.Indicator>
+                    </Checkbox.Root>
+                    <label className="Label" htmlFor="c1">
+                        Count highest only
+                    </label>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Checkbox.Root className="CheckboxRoot" defaultChecked id="c1" checked={onlyHighest} onCheckedChange={HandleOnlyHighest}>
+                    <Checkbox.Indicator className="CheckboxIndicator">
+                        <CheckIcon />
+                    </Checkbox.Indicator>
+                    </Checkbox.Root>
+                    <label className="Label" htmlFor="c1">
+                        Use odd one out
+                    </label>
+                    </div>
+                </div>
+            )
+
+        }
+        else{
+            return(
+                <>
+
+                </>
+            )
+        }
+    }
+}
