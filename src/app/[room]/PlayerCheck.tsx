@@ -24,7 +24,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [players, setPlayers] = useState([''])
     const [chosenAnswers, setChosenAnswers] = useState([''])
     const [highestAnswers, setHighestAnswers] = useState([''])
-    const [answers, setAnswers] = useState({chosen: [], highest: [], lone: []})
+    const [answers, setAnswers] = useState({prompt: '', chosen: [], highest: [], lone: []})
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
@@ -153,7 +153,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
                 setRound(messageObj.round);
-                setAnswers({chosen : messageObj.chosenAnswers,
+                setAnswers({prompt: messageObj.prompt,
+                            chosen : messageObj.chosenAnswers,
                             highest: messageObj.highestAnswers,
                             lone: messageObj.loneAnswers});
                 setPlayersWScores(messageObj.playerScores);
@@ -195,6 +196,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
           .then(response => response.text())
 
         setLoading(false);
+
+        console.log(result);
     
         return JSON.parse(result).body;
     }

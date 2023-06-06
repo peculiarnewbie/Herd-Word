@@ -87,6 +87,7 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
 
         setJoined(true);
         setCreatingRoom(false);
+        setIsMaster(true);
         setLoading(false);
         
     }

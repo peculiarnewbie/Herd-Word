@@ -2,24 +2,28 @@
 export default function RoundResults({round, answers, playersWScores}:{round:number, answers:any, playersWScores:any}){
     if(round == 1){
         return(
-            <p>answer with any random word that comes to your mind</p>
+            <>
+                <p>prompt: </p>
+                <p>{answers?.prompt}</p>
+            </>
         )
     }
     else if (round == 2){
         return(
             <>
-                <p>chosen: </p>
-                <p>1. {answers?.chosen[0]?.input} by {answers?.chosen[0]?.playerId}</p>
-                <p>2. {answers?.chosen[1]?.input} by {answers?.chosen[1]?.playerId}</p>
+                <p>prompt: </p>
+                <p>{answers?.prompt}</p>
             </>
         )
     }
     else{
         return(
             <>
-                <p>chosen: </p>
+                {/* <p>chosen: </p>
                 <p>1. {answers?.chosen[0]?.input} by {answers?.chosen[0]?.playerId}</p>
-                <p>2. {answers?.chosen[1]?.input} by {answers?.chosen[1]?.playerId}</p>
+                <p>2. {answers?.chosen[1]?.input} by {answers?.chosen[1]?.playerId}</p> */}
+                <p>prompt: </p>
+                <p>{answers?.prompt}</p>
                 <p>highest: </p>
                 <p>1. {answers?.highest[0]?.input} score: {answers?.highest[0]?.score}</p>
                 <p>2. {answers?.highest[1]?.input} score: {answers?.highest[1]?.score}</p>

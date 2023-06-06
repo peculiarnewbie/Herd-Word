@@ -18,7 +18,8 @@ export const handler = async (event, context) => {
     const keys = [`herdword:${roomId}`, 
     `herdword:${roomId}:${round}:inputs`,
     `herdword:${roomId}:${round}:playerinputs`,
-    `herdword:${roomId}:${round}:inputRank`];
+    `herdword:${roomId}:${round}:inputRank`,
+    `herdword:${roomId}:questions`];
 	const args = [round, chosenAnswerCount]
 
     const advanceRound = await redis.eval(
@@ -31,12 +32,15 @@ export const handler = async (event, context) => {
         local playerInputs = redis.call('ZRANGE', KEYS[3], '0', '-1', 'WITHSCORES')
         local playersString = table.concat(playerInputs, '", "')
 
+        local prompt = cjson.encode(redis.call('HGET', KEYS[5], currentRound))
+
         if ARGV[1] == '0' then
-        return '{"round": ' .. currentRound .. ', "answers": "null", "rankedAnswers": "null"}'
+            return '{"round": ' .. currentRound .. ', "answers": "null", "rankedAnswers": "null", "prompt": ' .. prompt .. '}'
         else
             local highestAnswers = redis.call('ZREVRANGE', KEYS[4], '0', '-1', 'WITHSCORES')
             local highestString = table.concat(highestAnswers, '", "')
-            return '{"round": ' .. currentRound .. ', "answers": ["' .. answersString .. '"], "rankedAnswers": ["' .. highestString .. '"], "playerInputs": ["' .. playersString .. '"]}'
+            
+            return '{"round": ' .. currentRound .. ', "answers": ["' .. answersString .. '"], "rankedAnswers": ["' .. highestString .. '"], "playerInputs": ["' .. playersString .. '"], "prompt": ' .. prompt .. '}'
         end`,
         keys,
         args
@@ -49,6 +53,7 @@ export const handler = async (event, context) => {
     const answers = parsed.answers;
     const rankedAnswers = parsed.rankedAnswers;
     const playerInputs = parsed.playerInputs;
+    const prompt = parsed.prompt;
     let answersFlat = [];
     let answersArr = [];
     let playerInputsArr = [];
@@ -182,8 +187,14 @@ export const handler = async (event, context) => {
 
 
 
+    // let JSONResponse = {round: parsed.round,
+    //                     chosenAnswers: chosenArr,
+    //                     highestAnswers: top5Arr,
+    //                     loneAnswers: lowestArr,
+    //                     playerScores: playerScoresArr}
+
     let JSONResponse = {round: parsed.round,
-                        chosenAnswers: chosenArr,
+                        prompt: prompt,
                         highestAnswers: top5Arr,
                         loneAnswers: lowestArr,
                         playerScores: playerScoresArr}
