@@ -12,7 +12,9 @@ export interface GameParams {
   endTarget: string;
   onlyHighest?: boolean;
   useOddOneOut?: boolean;
+  questionSets?: string[];
   isElimination?: boolean;
+
 }
 
 export default function CreateRoom({roomId, playerId, loading, setLoading, setJoined, setCreatingRoom, setIsMaster} : {roomId:any, playerId:string, loading:boolean, setLoading:any, setJoined:any, setCreatingRoom:any, setIsMaster:any}){
@@ -49,6 +51,8 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
             gameParams.onlyHighest = event.target.onlyHighest.dataset.state == 'checked' ? true : false
             gameParams.useOddOneOut = event.target.useOddOneOut.dataset.state == 'checked' ? true : false
           } 
+
+          gameParams.questionSets = ['icameup', 'curatedofficial', 'curatedfeud']
 
         }
 

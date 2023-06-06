@@ -10,7 +10,7 @@ import { GameParams } from "./CreateRoom";
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores}: {loading:boolean, round:number, roomId:string, playerId:string, answers:any, playersWScores:any}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams}: {loading:boolean, round:number, roomId:string, playerId:string, answers:any, playersWScores:any, gameParams:any}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState('')
     const [inputId, setInputId] = useState('')

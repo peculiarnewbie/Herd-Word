@@ -30,6 +30,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [round, setRound] = useState(0);
     const [roomInfo, setRoomInfo] = useState({})
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
+    const [gameParams, setGameParams] = useState({})
     let fromCookie = false;
     const [playerId, setPlayerId] = useState('');
     let id = ''
@@ -108,6 +109,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                     document.cookie = `isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT`
                     setIsMaster(false);
                     setMessage(`welcome, ${id}`)
+                    setGameParams(result.roomInfo.params)
                     setJoined(true)
                 }
                 else if(result.code == 103){
@@ -116,6 +118,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                     setRound(result.roomInfo.round)
                     console.log(result.roomInfo.roomMaster, id)
                     if(result.roomInfo.roomMaster == id) setIsMaster(true);
+                    setGameParams(result.roomInfo.params)
                     setJoined(true)
                 }
                 else if(result.code == 104){
@@ -243,7 +246,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     else{
         return(
             <>
-                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores}></PlayArea>
+                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores} gameParams={gameParams}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>
