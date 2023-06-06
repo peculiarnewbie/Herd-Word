@@ -20,6 +20,7 @@ export default function RoomParams(){
     const [hotJoinable, setHotJoinable] = useState(true);
     const [gameType, setGameType] = useState('0');
     const [onlyHighest, setOnlyHighest] = useState(true);
+    const [useOddOneOut, setUseOddOneOut] = useState(false);
 
     
 
@@ -27,6 +28,10 @@ export default function RoomParams(){
 
     const HandleOnlyHighest = (event:any) => {
         setOnlyHighest(!onlyHighest)
+    }
+
+    const HandleUseOddOneOut = (event:any) => {
+        setUseOddOneOut(!useOddOneOut)
     }
 
     const HandleHotJoinCheckBox = (event:any) => {
@@ -60,9 +65,9 @@ export default function RoomParams(){
     function GameTypeDropDown(){
         return(
             <>
-                <label className="Label" htmlFor="c1">
-                Game Type:
-            </label>
+                <label className="Label" htmlFor="gameType">
+                    Game Type:
+                </label>
             <Select.Root value={gameTypes['0']} onValueChange={setGameType}>
                 <Select.Trigger aria-valuenow={parseInt(gameType)} id="gameType" className="SelectTrigger" aria-label="Type">
                 <Select.Value placeholder="Select a game type">
@@ -201,7 +206,6 @@ export default function RoomParams(){
                     {
                         herdEnds == '1' && (
                             <ValueSlider id="herdScoreTarget" defaultValue={5} min={3} max={10}></ValueSlider>
-                            
                             )
                         }
                     {
@@ -210,7 +214,7 @@ export default function RoomParams(){
                         )
                     }
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Checkbox.Root className="CheckboxRoot" defaultChecked id="c1" checked={onlyHighest} onCheckedChange={HandleOnlyHighest}>
+                    <Checkbox.Root className="CheckboxRoot" defaultChecked id="onlyHighest" checked={onlyHighest} onCheckedChange={HandleOnlyHighest}>
                     <Checkbox.Indicator className="CheckboxIndicator">
                         <CheckIcon />
                     </Checkbox.Indicator>
@@ -220,7 +224,7 @@ export default function RoomParams(){
                     </label>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Checkbox.Root className="CheckboxRoot" defaultChecked id="c1" checked={onlyHighest} onCheckedChange={HandleOnlyHighest}>
+                    <Checkbox.Root className="CheckboxRoot" id="useOddOneOut" checked={useOddOneOut} onCheckedChange={HandleUseOddOneOut}>
                     <Checkbox.Indicator className="CheckboxIndicator">
                         <CheckIcon />
                     </Checkbox.Indicator>

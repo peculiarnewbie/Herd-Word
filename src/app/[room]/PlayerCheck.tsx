@@ -19,7 +19,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [cookies, setCookie] = useCookies(['playerId', 'isMaster']);
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
-    const [joined, setJoined] = useState(true)
+    const [joined, setJoined] = useState(false)
     const [loading, setLoading] = useState(true)
     const [players, setPlayers] = useState([''])
     const [chosenAnswers, setChosenAnswers] = useState([''])
@@ -43,10 +43,31 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     }, [isMaster])
 
     useEffect(() => {
+        const ConnectToAbly  = async () => {
+            ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
+            await ably.connection.once('connected');
+            console.log('Connected to Ably!');
+            
+            gameChannel = ably.channels.get(`[?rewind=1]herdword:${roomId}`);
+        }
+
+        ConnectToAbly()
+
+        return () => {
+            gameChannel.detach();
+            ably.close()
+        }
+    }, [])
+
+    useEffect(() => {
         
 
         const  CheckPlayer = async () => {
-            if(cookies.isMaster) setIsMaster(true);
+            if(isMaster){
+                await SubToAblyActions()
+                return;
+            }
+            // if(cookies.isMaster) setIsMaster(true);
             if(cookies.playerId){
                 id = cookies.playerId
                 setPlayerId(id)
@@ -70,10 +91,12 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
             if(id){
                 const result = JSON.parse(await CallCreateRoom(roomId, id, fromCookie));
 
+                console.log(result)
+
                 if(result.code == 101){
-                    await SubToAblyActions()
-                    if(!fromCookie) document.cookie = `playerId=${id}`
-                    document.cookie = `isMaster=true`
+                    // await SubToAblyActions()
+                    // if(!fromCookie) document.cookie = `playerId=${id}`
+                    // document.cookie = `isMaster=true`
                     setCreatingRoom(true);
                     // setIsMaster(true);
                     setMessage(`create a room`)
@@ -91,6 +114,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                     await SubToAblyActions()
                     setMessage(`welcome back, ${id}`)
                     setRound(result.roomInfo.round)
+                    console.log(result.roomInfo.roomMaster, id)
+                    if(result.roomInfo.roomMaster == id) setIsMaster(true);
                     setJoined(true)
                 }
                 else if(result.code == 104){
@@ -120,14 +145,6 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
             setLoading(false)
         }
 
-        const ConnectToAbly  = async () => {
-            ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
-            await ably.connection.once('connected');
-            console.log('Connected to Ably!');
-            
-            gameChannel = ably.channels.get(`[?rewind=1]herdword:${roomId}`);
-        }
-
         const SubToAblyActions = async () => {
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
@@ -143,16 +160,13 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
             });
         }
 
-
-        ConnectToAbly()
         CheckPlayer()
 
         return () => {
-            gameChannel.detach();
-            ably.close()
+
         };
 
-    }, [playerIdFromQuery])
+    }, [playerIdFromQuery, isMaster])
 
     const AdvanceRound = async () =>{
         setLoading(true);
@@ -199,7 +213,14 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     if(creatingRoom){
         return(
             <>
-                <CreateRoom roomId={roomId} playerId={playerId}></CreateRoom>
+                <CreateRoom roomId={roomId} 
+                            playerId={playerId}
+                            loading={loading}
+                            setLoading={setLoading} 
+                            setJoined = {setJoined}
+                            setCreatingRoom = {setCreatingRoom}
+                            setIsMaster = {setIsMaster}
+                            ></CreateRoom>
             </>
         )
     }

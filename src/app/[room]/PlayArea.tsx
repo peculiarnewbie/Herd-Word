@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import FormButton from "@/components/FormButton";
 import PlayerScore from "./PlayerScore";
 import RoundResults from "./RoundResults";
+import { GameParams } from "./CreateRoom";
 
 
 

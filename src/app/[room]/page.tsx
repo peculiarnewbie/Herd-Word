@@ -29,39 +29,10 @@ export default async function Page({ params }: { params: { room: string } }){
         };
         
         //@ts-ignore
-        const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/createroom", requestOptions)
+        const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/joinroom", requestOptions)
           .then(response => response.text())
-    
-        return JSON.parse(result).body;
-      }
 
-      const CreateRoom = async ({params} : {params:any}) => {
-        'use server';
-        
-        console.log("at server", params);
-    
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "text/plain");
-        
-        var raw = JSON.stringify({
-          "roomId": `${params.roomId}`,
-          "userId": `${params.userId}`,
-          "type": `${params.type}`,
-          "hotJoin": `${params.hotJoin}`,
-          "params": `${params.params}`
-
-        });
-        
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          next: { revalidate: 0 }
-        };
-        
-        //@ts-ignore
-        const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/createroom", requestOptions)
-          .then(response => response.text())
+        console.log(result)
     
         return JSON.parse(result).body;
       }

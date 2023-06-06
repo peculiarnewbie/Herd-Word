@@ -19,6 +19,7 @@ export const handler = async (event, context) => {
 
     const joinRoom = await redis.eval(
         `
+
         local function checkPlayer(name)
             local exist = redis.call('ZSCORE', KEYS[2], name)
             return exist
@@ -32,32 +33,32 @@ export const handler = async (event, context) => {
         end
 
         local currentRound = redis.call('HGET', KEYS[1], 'round')
-        local roomInfo = redis.call('HGETALL', KEYS[1])
-        local roomInfoString = table.concat(roomInfo, '", "')
+        local roomInfo =  redis.call('HGETALL', KEYS[1])
+        local roomInfoString = cjson.encode(roomInfo)
 
         if not currentRound then
             return '{"code": 101, "message": "create room", "players": ["' .. ARGV[2] .. '"], "roomInfo": [""]}'
         elseif currentRound == '0' then
             local exist = checkPlayer(ARGV[2])
             if exist and ARGV[3] == 'false'  then
-                return '{"code": 104, "message":"name exists in room", "players": "null", "roomInfo": ["' .. roomInfoString .. '"]}'
+                return '{"code": 104, "message":"name exists in room", "players": "null", "roomInfo": ' .. roomInfoString .. '}'
             else
                 local playersString = GetPlayers()
                 
                 if exist then
-                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
+                    return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ' .. roomInfoString .. '}'
                 else
-                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
+                    return '{"code": 102, "message": "Joined Room", "players": ["' .. playersString .. '"], "roomInfo": ' .. roomInfoString .. '}'
                 end
             end
         else
             local exist = checkPlayer(ARGV[2])
             if exist and ARGV[3] == 'true' then
                 local playersString = GetPlayers()
-                return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ["' .. roomInfoString .. '"]}'
+                return '{"code": 103, "message": "Welcome Back", "players": ["' .. playersString .. '"], "roomInfo": ' .. roomInfoString .. '}'
             else
                 --check for hot joining
-                return '{"code": 105, "message":"room is playing", "players": "null", "roomInfo": ["' .. roomInfoString .. '"]}'
+                return '{"code": 105, "message":"room is playing", "players": "null", "roomInfo": ' .. roomInfoString .. '}'
             end
         end`,
         keys,
@@ -70,7 +71,7 @@ export const handler = async (event, context) => {
 
     let roomInfo = {}
 
-    for(let i = 0; i < parsed.roomInfo.length; i += 2){
+    for(let i = 0; i < parsed?.roomInfo?.length; i += 2){
         roomInfo[parsed.roomInfo[i]] = parsed.roomInfo[i+1]
     }
 
