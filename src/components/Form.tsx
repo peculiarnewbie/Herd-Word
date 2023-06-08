@@ -47,7 +47,7 @@ const FormDemo = ({playerId}) => {
           <input className="Input" />
         </Form.Control>
       </Form.Field>
-      <FormButton withButton={true}></FormButton>
+      <FormButton withButton={true} label='continue'></FormButton>
     </Form.Root>
   )
 };

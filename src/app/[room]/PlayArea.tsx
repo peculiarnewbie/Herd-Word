@@ -6,6 +6,8 @@ import FormButton from "@/components/FormButton";
 import PlayerScore from "./PlayerScore";
 import RoundResults from "./RoundResults";
 import { GameParams } from "./CreateRoom";
+import PromptArea from "./PromptArea";
+import './playArea.css'
 
 
 
@@ -92,7 +94,8 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     if(showInput){
         return(
             <>
-                <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
+                {/* <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults> */}
+                <PromptArea prompt={answers.prompt}></PromptArea>
                 <Form.Root onSubmit={SendInput}>
                     <Form.Field className="FormField" name="answer">
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>

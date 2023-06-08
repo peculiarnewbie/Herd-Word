@@ -2,6 +2,10 @@
 @import '@radix-ui/colors/mauve.css';
 @import '@radix-ui/colors/violet.css';
 
+.WebRoot{
+  background-color: var(--blackA10);
+}
+
 .ScrollAreaRoot {
   width: 200px;
   height: 225px;

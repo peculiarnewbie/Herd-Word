@@ -2,6 +2,7 @@
 import { cookies } from 'next/headers';
 import FormDemo from '@/components/Form';
 import PlayerCheck from './PlayerCheck';
+import './styles.css';
 
 export default async function Page({ params }: { params: { room: string } }){
     const roomId = params.room;
@@ -68,9 +69,9 @@ export default async function Page({ params }: { params: { room: string } }){
     
 
     return(
-        <>
+        <div className="WebRoot">
             <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId}></PlayerCheck>
-        </>
+        </div>
     )
 
     
