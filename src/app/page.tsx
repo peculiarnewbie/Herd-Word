@@ -5,6 +5,8 @@ import { Redis } from "@upstash/redis";
 import FormDemo from "@/components/Form";
 import CustomForm from "@/components/CustomForm";
 import { cookies } from 'next/headers';
+import './styles.css'
+import CustomCheckbox from "@/components/CustomCheck";
 
 // let roomId = ""
 // let playerId = ""
@@ -14,7 +16,10 @@ export default function App(){
   const playerId = cookies().get("playerId")?.value;
   
     return(
-    <div>
+    <div className="WebRoot">
+      
+      <CustomCheckbox checkState={true}></CustomCheckbox>
+      
       
       <h1>Welcome folks</h1>
       <Link href="/page">
