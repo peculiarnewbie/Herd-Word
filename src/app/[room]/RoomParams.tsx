@@ -40,10 +40,11 @@ export default function RoomParams(){
 
     return(
         <>
-            <HotJoinCheck></HotJoinCheck>
             <GameTypeDropDown></GameTypeDropDown>
             
             <GameParams></GameParams>
+            
+            <HotJoinCheck></HotJoinCheck>
         </>
     )
 
@@ -64,7 +65,7 @@ export default function RoomParams(){
 
     function GameTypeDropDown(){
         return(
-            <>
+            <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
                 <label className="Label" htmlFor="gameType">
                     Game Type:
                 </label>
@@ -128,14 +129,14 @@ export default function RoomParams(){
                 </Select.Content>
                 </Select.Portal>
             </Select.Root>
-            </>
+            </div>
         )
     }
 
     function ValueSlider({id, defaultValue, min, max}: {id:string, defaultValue:number, min:number, max:number}){
         const [sliderValue, setSliderValue] = useState([defaultValue])
         return(
-            <div style={{ display: 'flex', alignItems: 'center', gap:"1rem"}}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent:'center', gap:"1rem", width: '100%'}}>
                 <Slider.Root name={id} className="SliderRoot" defaultValue={sliderValue} min={min} max={max} step={1} onValueChange={setSliderValue}>
                 <Slider.Track className="SliderTrack">
                     <Slider.Range className="SliderRange" />
@@ -152,21 +153,22 @@ export default function RoomParams(){
         
         if(gameType == '0'){
             return(
-                <>
+                <div className="GameParams">
                     <p>Playing Herd Game with Default Parameters</p>
                     
-                </>
+                </div>
             )
 
         }
         else if(gameType == '1'){
             return(
-                <div className="GameParams" id="GameParams">
+                <>
                     <p>Choose Parameters</p>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label className="Label" htmlFor="c1">
+                <div className="GameParams" id="GameParams">
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                    <p>
                         End of game condition:
-                    </label>
+                    </p>
                     <Select.Root value={herdEndConditions['0']} onValueChange={setHerdEnds}>
                         <Select.Trigger aria-valuenow={parseInt(herdEnds)} id="herdEndCondition" className="SelectTrigger" aria-label="Type">
                         <Select.Value placeholder="Select a game type">
@@ -203,6 +205,7 @@ export default function RoomParams(){
                         </Select.Portal>
                     </Select.Root>
                     </div>
+
                     {
                         herdEnds == '1' && (
                             <ValueSlider id="herdScoreTarget" defaultValue={5} min={3} max={10}></ValueSlider>
@@ -234,6 +237,7 @@ export default function RoomParams(){
                     </label>
                     </div>
                 </div>
+            </>
             )
 
         }

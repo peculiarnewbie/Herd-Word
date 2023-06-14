@@ -3,7 +3,7 @@
 export default function Layout({ children }) {
     return (
       <>
-        <main className="WebRoot">{children}</main>
+        <main className="BG">{children}</main>
       </>
     );
   }

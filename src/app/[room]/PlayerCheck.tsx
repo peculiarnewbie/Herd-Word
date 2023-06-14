@@ -3,7 +3,6 @@ import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import RoomLobby from "./RoomLobby"
 import Ably from 'ably'
-import { useCookies } from 'react-cookie';
 import PlayerScore from "./PlayerScore";
 import PlayArea from "./PlayArea"
 import OptionalButton from "./OptionalButton"
@@ -16,7 +15,6 @@ let ably:Ably.Types.RealtimePromise;
 //@ts-ignore
 export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playerIdFromQuery, setFromQuery] = useState(useSearchParams()?.get('playerId'))
-    const [cookies, setCookie] = useCookies(['playerId', 'isMaster']);
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
     const [joined, setJoined] = useState(false)
@@ -32,8 +30,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     const [gameParams, setGameParams] = useState({})
     let fromCookie = false;
-    const [playerId, setPlayerId] = useState('');
-    let id = ''
+    const [playerId, setPlayerId] = useState<string|null>('');
+    let id: string | null = ''
 
     useEffect(() => {
         const DoShtForMaster = async () =>{
@@ -69,8 +67,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 return;
             }
             // if(cookies.isMaster) setIsMaster(true);
-            if(cookies.playerId){
-                id = cookies.playerId
+            if(localStorage.getItem('playerId')){
+                id = localStorage.getItem('playerId')
                 setPlayerId(id)
                 fromCookie = true;
             }
@@ -101,16 +99,18 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                     setCreatingRoom(true);
                     // setIsMaster(true);
                     setMessage(`create a room`)
+                    localStorage.setItem('round', '0')
                     // setJoined(true)
                 }
                 else if(result.code == 102){
                     await SubToAblyActions()
-                    if(!fromCookie) document.cookie = `playerId=${id}`
-                    document.cookie = `isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                    if(!fromCookie) localStorage.setItem('playerId', id)
+                    localStorage.removeItem('isMaster')
                     setIsMaster(false);
                     setMessage(`welcome, ${id}`)
                     setGameParams(result.roomInfo.params)
                     setJoined(true)
+                    localStorage.setItem('round', '0')
                 }
                 else if(result.code == 103){
                     await SubToAblyActions()
@@ -149,6 +149,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         }
 
         const SubToAblyActions = async () => {
+            
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
@@ -162,6 +163,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 console.log(round, answers);
                 // ReceiveRoomAction(message.data)
             });
+
+            console.log('subbed to actions')
         }
 
         CheckPlayer()
@@ -204,8 +207,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
     const DelCommand = () => {
         let delCommand = "DEL "
-        delCommand += `herdword:${roomId} herdword:${roomId}:players herdword:${roomId}:lonest `
-        for(let i = 1; i < round; i++){
+        delCommand += `herdword:${roomId} herdword:${roomId}:players herdword:${roomId}:lonest herdword:${roomId}:questions herdword:${roomId}:questionsunion `
+        for(let i = 1; i <= round; i++){
             delCommand += `herdword:${roomId}:${i}:inputs herdword:${roomId}:${i}:playerinputs herdword:${roomId}:${i}:inputRank `
         }
 
@@ -226,6 +229,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                             setJoined = {setJoined}
                             setCreatingRoom = {setCreatingRoom}
                             setIsMaster = {setIsMaster}
+                            setMessage={setMessage}
                             ></CreateRoom>
             </>
         )
@@ -233,7 +237,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
     if(round == 0){
         return(
-            <>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center'}}>
                 <RoomLobby
                 joined={joined} 
                 message={message} 
@@ -242,14 +246,20 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 setLoading={setLoading} 
                 roomId={roomId}
                 setId={setFromQuery}></RoomLobby>
-                <OptionalButton show={isMaster && !loading} text="Start Game" onClick={AdvanceRound}></OptionalButton>
-            </>
+                {isMaster? (
+                    <OptionalButton show={isMaster && !loading} text="Start Game" onClick={AdvanceRound}></OptionalButton>
+
+                ) : loading ? (<></>
+                ) : joined ? (
+                    <p>wait for the room master to start the game</p>
+                ) : (<></>)}
+            </div>
         )
     }
     else{
         return(
             <>
-                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores} gameParams={gameParams}></PlayArea>
+                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores} gameParams={gameParams} isMaster={isMaster}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>

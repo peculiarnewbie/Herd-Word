@@ -122,7 +122,9 @@ export const handler = async (event, context) => {
             
             if(lowestArr){
                 for(let i = 0; i < lowestArr.length; i++){
-                    let playerId = playerInputsArr.find(s => s.inputId === lowestArr[i].inputId)?.playerId
+                    const playerInput = playerInputsArr.find(s => s.inputId === lowestArr[i].inputId)
+                    let playerId = ''
+                    if(playerInput) playerId = playerInput.playerId
                     pipe.zincrby(`herdword:${roomId}:lonest`, 1, `${playerId}`)
                 }
             }

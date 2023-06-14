@@ -2,8 +2,25 @@
 @import '@radix-ui/colors/mauve.css';
 @import '@radix-ui/colors/violet.css';
 
-.WebRoot{
+.BG{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-width: 100vw;
+  min-height: 100vh;
   background-color: var(--blackA10);
+}
+
+.WebRoot{
+  border-radius: 1rem;
+  margin: 2rem;
+  padding: 2rem;
+  background-color: var(--blackA10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 400px;
+  width: 70%;
 }
 
 .ScrollAreaRoot {
@@ -209,6 +226,13 @@ button {
   cursor: default;
 }
 
+.RoomParams{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
 .GameParams{
   display: flex;
   flex-direction: column;
@@ -257,4 +281,12 @@ button {
 .SliderThumb:focus {
   outline: none;
   box-shadow: 0 0 0 5px var(--blackA8);
+}
+
+.CreateRoom{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-width: 500px;
 }

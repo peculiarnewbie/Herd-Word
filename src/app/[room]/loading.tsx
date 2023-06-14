@@ -1,7 +1,10 @@
-
+import './styles.css'
 
 export default function Loading() {
     return (
-        <p>loading...</p>
+        <div className="WebRoot">
+            <p>loading...</p>
+
+        </div>
     )
   }

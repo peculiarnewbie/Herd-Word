@@ -1,4 +1,5 @@
 import * as Form from '@radix-ui/react-form';
+import './styles.css'
 
 export default function FormButton({withButton, label} : {withButton:boolean, label:string}){
     if(withButton){

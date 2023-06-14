@@ -1,5 +1,4 @@
 
-import { cookies } from 'next/headers';
 import FormDemo from '@/components/Form';
 import PlayerCheck from './PlayerCheck';
 import './styles.css';

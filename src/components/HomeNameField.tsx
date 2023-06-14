@@ -11,15 +11,15 @@ export default function HomeNameField({playerId, setPlayerId}){
       }, [forReRender])
 
     const DeleteIdCookie = () => {
-        document.cookie = "playerId=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        document.cookie = "isMaster=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        localStorage.removeItem('playerId')
+        localStorage.removeItem('isMaster')
         console.log("deleted cookie")
         setPlayerId("null");
     }
 
     if(playerId != "null"){
         return(
-            <div>
+            <div style={{display: 'flex', gap: '1rem', paddingTop: '1rem', alignItems: 'center'}}>
                 <p>welcome, {playerId}</p>
                 <button type="button" className="Button" onClick={DeleteIdCookie}>change name</button>
             </div>
@@ -27,7 +27,7 @@ export default function HomeNameField({playerId, setPlayerId}){
     }
     else {
         return(
-            <NameField withButton={false} label='name' message='Please enter your name'></NameField>
+            <NameField withButton={false} label='Name' message='Please enter your name'></NameField>
         )
     }
 }

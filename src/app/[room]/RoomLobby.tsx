@@ -8,7 +8,6 @@ import './styles.css'
 
 export default function RoomLobby({loading, joined, message, players, roomId, setId, setLoading }: {loading:boolean, joined:boolean, message:string, players:string[], roomId:string, setId:any, setLoading:any}){
 
-
     //@ts-ignore
     const CallCreateRoom = async (event) => {
         event.preventDefault();

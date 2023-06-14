@@ -17,7 +17,7 @@ export interface GameParams {
 
 }
 
-export default function CreateRoom({roomId, playerId, loading, setLoading, setJoined, setCreatingRoom, setIsMaster} : {roomId:any, playerId:string, loading:boolean, setLoading:any, setJoined:any, setCreatingRoom:any, setIsMaster:any}){
+export default function CreateRoom({roomId, playerId, loading, setLoading, setJoined, setCreatingRoom, setIsMaster, setMessage} : {roomId:any, playerId:string | null, loading:boolean, setLoading:any, setJoined:any, setCreatingRoom:any, setIsMaster:any, setMessage:any}){
 
     //@ts-ignore
     const CallCreateRoom = async (event) =>{
@@ -81,14 +81,19 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
         const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/createroom", requestOptions)
           .then(response => response.text())
 
-        
+        const parsed = JSON.parse(result);
+
+        if(parsed.statusCode == 200){
+          setJoined(true);
+          setCreatingRoom(false);
+          setIsMaster(true);
+          setLoading(false);
+          localStorage.setItem('playerId', playerId ? playerId : '')
+          localStorage.setItem('isMaster', 'true')
+        }
 
         console.log(JSON.parse(result).body)
 
-        setJoined(true);
-        setCreatingRoom(false);
-        setIsMaster(true);
-        setLoading(false);
         
     }
 
@@ -100,13 +105,15 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
 
     else if(roomId){
       return(
-        <>
+        <div className='CreateRoom'>
           <p>creating a room with id: {roomId}</p>
           <Form.Root className="FormRoot" onSubmit={CallCreateRoom}>
-              <RoomParams></RoomParams>
+              <div className='RoomParams'>
+                <RoomParams></RoomParams>
+              </div>
               <FormButton withButton={true} label='Create Room'></FormButton>
           </Form.Root>
-        </>
+        </div>
       )
     }
 

@@ -12,10 +12,10 @@ import './playArea.css'
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams}: {loading:boolean, round:number, roomId:string, playerId:string, answers:any, playersWScores:any, gameParams:any}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState<string | null>('')
-    const [inputId, setInputId] = useState('')
+    const [inputId, setInputId] = useState<string | null>('')
 
     const[score, setScore] = useState(0);
     const[loneScore, setLoneScore] = useState(0);
@@ -27,21 +27,25 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
             const previousRound = localStorage.getItem('round')
             console.log('is reset')
             if(previousRound){
+                console.log(round, previousRound)
                 if(round == parseInt(previousRound)){
                     console.log('is resetting')
                     setConfirmedInput(localStorage.getItem('savedInput'))
                     setShowInput(false)
+                    return ;
                     
                 }
-                return ;
 
             }
+            console.log('showing input')
             setShowInput(true)
         }
-        else if(input && inputId){
+        else if(input){
+            console.log('saving input')
             setSendingAnswer(false);
             setShowInput(false);
             setConfirmedInput(input);
+            //@ts-ignore
             setInputId(inputId.toString());
             localStorage.setItem('savedInput', input)
             localStorage.setItem('round', round.toString())
@@ -116,9 +120,11 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         const parsed = JSON.parse(result);
         
         if(parsed.statusCode == 200){
+            console.log(input, parsed.body.inputId)
             HandleInputStates(true, input, parsed.body.inputId)
         }
         else{
+            console.log('problem with sending')
             HandleInputStates(false)
         }
           
@@ -141,7 +147,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                 {
                     showInput ? (
                         <PlayInput></PlayInput>
-                    ) : (
+                    ) :  (
                         <SendAnswerLoader></SendAnswerLoader>
                     )
                 }
