@@ -8,7 +8,9 @@ import FormButton from './FormButton';
 
 
 //@ts-ignore
-const FormDemo = ({playerId}) => {
+const FormDemo = () => {
+  const playerId = localStorage.getItem('playerId');
+  
   const [showName, setShowName] = useState("null");
   
 

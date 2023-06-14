@@ -1,5 +1,4 @@
 
-import FormDemo from '@/components/Form';
 import PlayerCheck from './PlayerCheck';
 import './styles.css';
 

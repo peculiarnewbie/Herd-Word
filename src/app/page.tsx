@@ -13,8 +13,6 @@ import CustomCheckbox from "@/components/CustomCheck";
 // let playerId = ""
 
 export default function App(){
-
-  const playerId = localStorage.getItem('playerId');
   
     return(
       <div className="BG">
@@ -31,7 +29,7 @@ export default function App(){
 
           <div style={{display: 'flex', minWidth:'300px', width: '50%'}}>
 
-            <FormDemo playerId = {playerId}></FormDemo>
+            <FormDemo></FormDemo>
           </div>
 
           {/* <form onSubmit={CallCreateRoom}>
