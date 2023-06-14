@@ -82,20 +82,20 @@ export const handler = async (event, context) => {
         if(round == '1'){
             lowestArr = [];
 
-            const min = 0;
-            const max = playerInputsArr.length - 1;
-            const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
-            let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-            while(randomInt1 == randomInt2){
-                if(max == 1) break;
-                randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-            } 
+            // const min = 0;
+            // const max = playerInputsArr.length - 1;
+            // const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            // let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+            // while(randomInt1 == randomInt2){
+            //     if(max == 1) break;
+            //     randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+            // } 
 
-            let chosen1 = playerInputsArr[randomInt1]
-            let chosen2 = playerInputsArr[randomInt2]
+            // let chosen1 = playerInputsArr[randomInt1]
+            // let chosen2 = playerInputsArr[randomInt2]
             
-            chosenArr.push({playerId: chosen1.playerId, input: answersArr.find(s => s.inputId == chosen1.inputId).input},
-                            {playerId: chosen2.playerId, input: answersArr.find(s => s.inputId == chosen2.inputId).input})
+            // chosenArr.push({playerId: chosen1.playerId, input: answersArr.find(s => s.inputId == chosen1.inputId).input},
+            //                 {playerId: chosen2.playerId, input: answersArr.find(s => s.inputId == chosen2.inputId).input})
         }
         else{
 
@@ -122,7 +122,7 @@ export const handler = async (event, context) => {
             
             if(lowestArr){
                 for(let i = 0; i < lowestArr.length; i++){
-                    let playerId = playerInputsArr.find(s => s.inputId === lowestArr[i].inputId).playerId
+                    let playerId = playerInputsArr.find(s => s.inputId === lowestArr[i].inputId)?.playerId
                     pipe.zincrby(`herdword:${roomId}:lonest`, 1, `${playerId}`)
                 }
             }

@@ -14,11 +14,47 @@ import './playArea.css'
 
 export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams}: {loading:boolean, round:number, roomId:string, playerId:string, answers:any, playersWScores:any, gameParams:any}){
     const [showInput, setShowInput] = useState(true);
-    const [confirmedInput, setConfirmedInput] = useState('')
+    const [confirmedInput, setConfirmedInput] = useState<string | null>('')
     const [inputId, setInputId] = useState('')
 
     const[score, setScore] = useState(0);
     const[loneScore, setLoneScore] = useState(0);
+
+    const [sendingAnswer, setSendingAnswer] = useState(false);
+
+    function HandleInputStates(sending?:boolean, input?:string, inputId?:number, reset?:boolean){
+        if(reset){
+            const previousRound = localStorage.getItem('round')
+            console.log('is reset')
+            if(previousRound){
+                if(round == parseInt(previousRound)){
+                    console.log('is resetting')
+                    setConfirmedInput(localStorage.getItem('savedInput'))
+                    setShowInput(false)
+                    
+                }
+                return ;
+
+            }
+            setShowInput(true)
+        }
+        else if(input && inputId){
+            setSendingAnswer(false);
+            setShowInput(false);
+            setConfirmedInput(input);
+            setInputId(inputId.toString());
+            localStorage.setItem('savedInput', input)
+            localStorage.setItem('round', round.toString())
+        }
+        else if(sending){
+            setSendingAnswer(true);
+            setShowInput(false);
+        }
+        else{
+            setSendingAnswer(false);
+            setShowInput(true);
+        }
+    }
 
     useEffect(() => {
         console.log("id before score:", inputId);
@@ -44,7 +80,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         }
 
         
-        setShowInput(true);
+        HandleInputStates(true, '', 0, true)
     }, [round])
 
     //@ts-ignore
@@ -53,7 +89,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
 
         const input = event.target.answer.value
 
-        setShowInput(false);
+        HandleInputStates(true)
         console.log("sending input");
     
         var myHeaders = new Headers();
@@ -76,13 +112,18 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         //@ts-ignore
         const result = await fetch("https://ng51i1t4j1.execute-api.ap-southeast-1.amazonaws.com/Prod/roomactions/sendinput", requestOptions)
           .then(response => response.text())
-
+          
+        const parsed = JSON.parse(result);
         
-        setConfirmedInput(input);
-
-        console.log(JSON.parse(result).body)
+        if(parsed.statusCode == 200){
+            HandleInputStates(true, input, parsed.body.inputId)
+        }
+        else{
+            HandleInputStates(false)
+        }
+          
+        console.log(parsed.statusCode)
     
-        setInputId(JSON.parse(result).body.inputId);
     }
 
     if(loading){
@@ -91,25 +132,20 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         )
     }
 
-    if(showInput){
+    else{
         return(
             <>
                 {/* <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults> */}
                 <PromptArea prompt={answers.prompt}></PromptArea>
-                <Form.Root onSubmit={SendInput}>
-                    <Form.Field className="FormField" name="answer">
-                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                        <Form.Label className="FormLabel">Answer</Form.Label>
-                        <Form.Message className="FormMessage" match="valueMissing">
-                            Please enter your answer
-                        </Form.Message>
-                        </div>
-                        <Form.Control asChild>
-                        <input className="Input" required />
-                        </Form.Control>
-                        <FormButton withButton={true} label="Continue"></FormButton>
-                    </Form.Field>
-                </Form.Root>
+
+                {
+                    showInput ? (
+                        <PlayInput></PlayInput>
+                    ) : (
+                        <SendAnswerLoader></SendAnswerLoader>
+                    )
+                }
+                
 
                 <p>round: {round}</p>
 
@@ -118,11 +154,39 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
             </>
         )
     }
-    else{
+
+    function PlayInput(){
         return(
-            <>
-                <p>You Answered {confirmedInput}</p>
-            </>
+            <Form.Root onSubmit={SendInput}>
+                <Form.Field className="FormField" name="answer">
+                    <div style={{textAlign : 'center', margin: '1rem'}}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', paddingBottom : '6px' }}>
+                        {/* <Form.Label className="FormLabel">Answer</Form.Label> */}
+                        <Form.Message className="FormMessage" match="valueMissing">
+                            Please enter your answer
+                        </Form.Message>
+                        </div>
+                        <Form.Control asChild >
+
+                            <input className="Input" required placeholder="What would the most common answer be?"  />
+                        </Form.Control>
+                        <FormButton withButton={true} label="Answer"></FormButton>
+                    </div>
+                </Form.Field>
+            </Form.Root>
+        )
+    }
+
+    function SendAnswerLoader(){
+        return (
+            <div style={{alignItems: 'center', textAlign: 'center', width: '100%', margin: '1rem'}}>
+
+                {sendingAnswer ? (
+                    <p>loading...</p>
+                    ) : (
+                        <p>You answered: {confirmedInput}</p>
+                        )}
+            </div>
         )
     }
 }
