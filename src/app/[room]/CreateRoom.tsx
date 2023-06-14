@@ -89,7 +89,6 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
           setIsMaster(true);
           setLoading(false);
           localStorage.setItem('playerId', playerId ? playerId : '')
-          localStorage.setItem('isMaster', 'true')
         }
 
         console.log(JSON.parse(result).body)

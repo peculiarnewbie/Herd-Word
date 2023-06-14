@@ -19,6 +19,14 @@ export const handler = async (event, context) => {
 
     const createRoom = await redis.eval(
         `  
+            local function shuffle(tab)
+                local len = #tab
+                local r
+                for i = 1, len do
+                    r = math.random(i, len)
+                    tab[i], tab[r] = tab[r], tab[i]
+                end
+            end
 
             local room = redis.call('HSET', KEYS[1], 'id', ARGV[1], 'round', '0', 'roomMaster', ARGV[2], 'hotJoinable', ARGV[3], 'params', ARGV[4])
             redis.call('ZADD', KEYS[2], 0, ARGV[2])
@@ -41,6 +49,8 @@ export const handler = async (event, context) => {
 
                 local chosenQuestions = {}
                 local iter = 1
+
+                shuffle(randQuestions)
 
                 for i, v in ipairs(randQuestions) do
                     chosenQuestions[iter] = i

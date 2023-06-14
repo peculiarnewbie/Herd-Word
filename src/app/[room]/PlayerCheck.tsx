@@ -10,7 +10,9 @@ import CreateRoom from "./CreateRoom"
 
 
 let gameChannel:Ably.Types.RealtimeChannelPromise;
+let answerChannel:Ably.Types.RealtimeChannelPromise;
 let ably:Ably.Types.RealtimePromise;
+let connectedToAbly = {value: true};
 
 //@ts-ignore
 export default function PlayerCheck({CallCreateRoom, roomId}) {
@@ -29,7 +31,6 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [roomInfo, setRoomInfo] = useState({})
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     const [gameParams, setGameParams] = useState({})
-    const [connectedToAbly, setConnectedToAbly] = useState(false);
     let fromCookie = false;
     const [playerId, setPlayerId] = useState<string|null>('');
     let id: string | null = ''
@@ -43,19 +44,21 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     }, [isMaster])
 
     useEffect(() => {
+        connectedToAbly.value = false
         const ConnectToAbly  = async () => {
             ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
-            setConnectedToAbly(true);
+            connectedToAbly.value = true
             gameChannel = ably.channels.get(`[?rewind=1]herdword:${roomId}`);
-
+            answerChannel = ably.channels.get(`herdword:${roomId}`)
         }
 
         ConnectToAbly()
 
         return () => {
             gameChannel.detach();
+            answerChannel.detach();
             ably.close()
         }
     }, [])
@@ -87,7 +90,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 setLoading(false);
                 return;
             }
-            console.log(id, roomId, fromCookie);
+            // console.log(id, roomId, fromCookie);
 
             if(id){
                 const result = JSON.parse(await CallCreateRoom(roomId, id, fromCookie));
@@ -118,7 +121,6 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                     await SubToAblyActions()
                     setMessage(`welcome back, ${id}`)
                     setRound(result.roomInfo.round)
-                    console.log(result.roomInfo.roomMaster, id)
                     if(result.roomInfo.roomMaster == id) setIsMaster(true);
                     setGameParams(result.roomInfo.params)
                     setJoined(true)
@@ -151,7 +153,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         }
 
         const SubToAblyActions = async () => {
-            await waitFor(connectedToAbly == true)
+            await waitFor(connectedToAbly)
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
@@ -166,7 +168,28 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 // ReceiveRoomAction(message.data)
             });
 
+            if(isMaster) await SubToAblyAnswers()
+
             console.log('subbed to actions')
+        }
+
+        const SubToAblyAnswers = async () => {
+            await answerChannel.subscribe(':answers', (message) => {
+                console.log('Received an answer in realtime: ' + message.data)
+                const messageObj = JSON.parse(message.data);
+                setRound(messageObj.round);
+                setAnswers({prompt: messageObj.prompt,
+                            chosen : messageObj.chosenAnswers,
+                            highest: messageObj.highestAnswers,
+                            lone: messageObj.loneAnswers});
+                setPlayersWScores(messageObj.playerScores);
+
+                console.log(round, answers);
+                // ReceiveRoomAction(message.data)
+            });
+
+            console.log('subbed to answers')
+
         }
 
         CheckPlayer()
@@ -177,13 +200,17 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
     }, [playerIdFromQuery, isMaster])
 
-    const waitFor = async (condition:boolean) => {
-        function checkAgain(){
-            if(condition) return;
+    const waitFor = async (condition:any) => {
+        const checkAgain = async () =>{
+            if(condition.value){
+                return;
+            } 
             else{
-                setTimeout(checkAgain, 200)
+                await new Promise(resolve => setTimeout(resolve, 100))
+                await checkAgain()
             }
         }
+        await checkAgain()
     }
 
     function waitFord(conditionFunction:any) {
