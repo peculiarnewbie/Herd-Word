@@ -29,6 +29,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [roomInfo, setRoomInfo] = useState({})
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     const [gameParams, setGameParams] = useState({})
+    const [connectedToAbly, setConnectedToAbly] = useState(false);
     let fromCookie = false;
     const [playerId, setPlayerId] = useState<string|null>('');
     let id: string | null = ''
@@ -46,8 +47,9 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
             ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
             await ably.connection.once('connected');
             console.log('Connected to Ably!');
-            
+            setConnectedToAbly(true);
             gameChannel = ably.channels.get(`[?rewind=1]herdword:${roomId}`);
+
         }
 
         ConnectToAbly()
@@ -149,7 +151,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         }
 
         const SubToAblyActions = async () => {
-            
+            await waitFor(connectedToAbly == true)
             await gameChannel.subscribe(':actions', (message) => {
                 console.log('Received a greeting message in realtime: ' + message.data)
                 const messageObj = JSON.parse(message.data);
@@ -174,6 +176,25 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         };
 
     }, [playerIdFromQuery, isMaster])
+
+    const waitFor = async (condition:boolean) => {
+        function checkAgain(){
+            if(condition) return;
+            else{
+                setTimeout(checkAgain, 200)
+            }
+        }
+    }
+
+    function waitFord(conditionFunction:any) {
+        //@ts-ignore
+        const poll = resolve => {
+          if (conditionFunction()) resolve();
+          else setTimeout(() => poll(resolve), 200);
+        }
+      
+        return new Promise(poll);
+      }
 
     const AdvanceRound = async () =>{
         setLoading(true);
@@ -200,9 +221,11 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
         setLoading(false);
 
-        console.log(result);
+        const parsed = JSON.parse(result)
+
+        console.log(parsed);
     
-        return JSON.parse(result).body;
+        return parsed.body;
     }
 
     const DelCommand = () => {
