@@ -1,4 +1,4 @@
-'use client'
+
 import TextInput from "@/components/TextInput";
 import TestButton from "@/components/TestButton";
 import Link from 'next/link'

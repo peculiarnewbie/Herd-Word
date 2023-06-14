@@ -9,12 +9,13 @@ import FormButton from './FormButton';
 
 //@ts-ignore
 const FormDemo = () => {
-  const playerId = localStorage.getItem('playerId');
-  
+  const[playerId, setPlayerId] = useState<string | null>(null)
+
   const [showName, setShowName] = useState("null");
   
 
   useEffect(() => {
+    setPlayerId(localStorage.getItem('playerId'))
     if(playerId) setShowName(playerId)
     else setShowName("null")
   }, [])
