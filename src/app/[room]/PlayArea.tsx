@@ -12,7 +12,7 @@ import './playArea.css'
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster, PublishInput, inputs}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean, PublishInput:any, inputs:any[]}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState<string | null>('')
     const [inputId, setInputId] = useState<string | null>('')
@@ -120,15 +120,16 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         const parsed = JSON.parse(result);
         
         if(parsed.statusCode == 200){
-            console.log(input, parsed.body.inputId)
-            HandleInputStates(true, input, parsed.body.inputId)
+            console.log(input, parsed.body[0])
+            HandleInputStates(true, input, parsed.body[0])
         }
         else{
             console.log('problem with sending')
             HandleInputStates(false)
         }
           
-        console.log(parsed.statusCode)
+        console.log(result)
+        console.log(parsed)
     
     }
 
@@ -156,6 +157,14 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                 <p>round: {round}</p>
 
                 <PlayerScore score={score} lone={loneScore}></PlayerScore>
+
+                {
+                    isMaster ? (
+                        <p>{JSON.stringify(inputs)}</p>
+                    ) : (
+                        <></>
+                    )
+                }
             
             </>
         )

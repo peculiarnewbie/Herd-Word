@@ -3,6 +3,7 @@ import PlayerCheck from './PlayerCheck';
 import './styles.css';
 
 export default async function Page({ params }: { params: { room: string } }){
+
     const roomId = params.room;
 
     //@ts-ignore
@@ -36,39 +37,40 @@ export default async function Page({ params }: { params: { room: string } }){
         return JSON.parse(result).body;
       }
 
-      // const SubToRedisAnswers = async ({roomId} : {roomId:string}) => {
-      //   'use server';
+      //@ts-ignore
+      const PublishInput = async (input, inputId, passedRoomId) => {
+        'use server';
+        const message = {input, inputId}
 
-      //   const redis = createClient({
-      //       url: process.env.REDIS_URL
-      //     });
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Basic SGdreDdBLjg1NVdXUTpHNVg5RFFFaFFTQjk3elR0VDBHZEpiX0k5bW9ua0xrSlpqUGJkaGdSN2Iw");
+        myHeaders.append("Content-Type", "application/json");
 
-      //   await redis.connect()
+        var raw = JSON.stringify({
+          "name": ":answers",
+          "data": JSON.stringify(message)
+        });
 
-      //   console.log(`connected to redis`);
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
 
-      //   redis.unsubscribe()
+        //@ts-ignore
+        const result = await fetch(`https://rest.ably.io/channels/herdword:${passedRoomId}/messages`, requestOptions)
+          .then(response => response.text())
 
-      //   redis.subscribe('channel', (err, count) => {
-      //     if (err) {
-      //       //@ts-ignore
-      //       console.error(err.message);
-      //       return;
-      //     }
-      //     console.log(`Subscribed to ${count} channels.`);
-      //   })
+        return JSON.parse(result)
 
-      //   redis.on('message', (channel, message) => {
-      //     console.log(`Received message from ${channel} channel.`);
-      //     console.log(JSON.parse(message));
-      //   });
-    // }
+      }
 
     
 
     return(
         <div className="WebRoot">
-            <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId}></PlayerCheck>
+            <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId} PublishInput={PublishInput}></PlayerCheck>
         </div>
     )
 

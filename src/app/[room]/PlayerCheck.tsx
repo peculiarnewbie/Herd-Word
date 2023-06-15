@@ -15,16 +15,15 @@ let ably:Ably.Types.RealtimePromise;
 let connectedToAbly = {value: true};
 
 //@ts-ignore
-export default function PlayerCheck({CallCreateRoom, roomId}) {
+export default function PlayerCheck({CallCreateRoom, roomId, PublishInput}) {
     const [playerIdFromQuery, setFromQuery] = useState(useSearchParams()?.get('playerId'))
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
     const [joined, setJoined] = useState(false)
     const [loading, setLoading] = useState(true)
     const [players, setPlayers] = useState([''])
-    const [chosenAnswers, setChosenAnswers] = useState([''])
-    const [highestAnswers, setHighestAnswers] = useState([''])
     const [answers, setAnswers] = useState({prompt: '', chosen: [], highest: [], lone: []})
+    const [inputs, setInputs] = useState<any>([])
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
@@ -176,15 +175,9 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         const SubToAblyAnswers = async () => {
             await answerChannel.subscribe(':answers', (message) => {
                 console.log('Received an answer in realtime: ' + message.data)
-                const messageObj = JSON.parse(message.data);
-                setRound(messageObj.round);
-                setAnswers({prompt: messageObj.prompt,
-                            chosen : messageObj.chosenAnswers,
-                            highest: messageObj.highestAnswers,
-                            lone: messageObj.loneAnswers});
-                setPlayersWScores(messageObj.playerScores);
-
-                console.log(round, answers);
+                const messageObj = JSON.parse(message.data)
+                //@ts-ignore
+                setInputs(inputs => [...inputs, messageObj])
                 // ReceiveRoomAction(message.data)
             });
 
@@ -213,15 +206,11 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
         await checkAgain()
     }
 
-    function waitFord(conditionFunction:any) {
-        //@ts-ignore
-        const poll = resolve => {
-          if (conditionFunction()) resolve();
-          else setTimeout(() => poll(resolve), 200);
-        }
-      
-        return new Promise(poll);
-      }
+    //@ts-ignore
+    const CallPublishInput = async (input, inputId, passedRoomId) => {
+        console.log('calling publish input: ', input, inputId, passedRoomId)
+        await PublishInput(input, inputId, passedRoomId)
+    }
 
     const AdvanceRound = async () =>{
         setLoading(true);
@@ -309,7 +298,16 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     else{
         return(
             <>
-                <PlayArea loading={loading} round={round} roomId={roomId} playerId={playerId} answers={answers} playersWScores={playersWScores} gameParams={gameParams} isMaster={isMaster}></PlayArea>
+                <PlayArea loading={loading} 
+                        round={round} 
+                        roomId={roomId} 
+                        playerId={playerId} 
+                        answers={answers} 
+                        playersWScores={playersWScores} 
+                        gameParams={gameParams} 
+                        isMaster={isMaster} 
+                        PublishInput={CallPublishInput}
+                        inputs={inputs}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>
