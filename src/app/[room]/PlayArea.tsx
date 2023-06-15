@@ -175,11 +175,14 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         const inputRef = useRef(null)
 
         useEffect(() => {
-            setInputRefs([])
+            let newRefs:any = []
             inputs.forEach((x) => {
-                setInputRefs([...inputRefs, createRef()])
+                console.log('adding refs')
+                newRefs = [...newRefs, createRef()]
             })
-        }, inputs)
+            setInputRefs(newRefs)
+            console.log(inputRefs)
+        }, [inputs])
         
         const triggerCombination = () => {
             console.log('triggering Combination')
