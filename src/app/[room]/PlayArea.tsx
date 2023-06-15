@@ -1,7 +1,7 @@
 import PlayerList from "./PlayerList";
 import NameField from "@/components/NameField";
 import * as Form from '@radix-ui/react-form';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, forwardRef, useImperativeHandle, FC, createRef } from "react";
 import FormButton from "@/components/FormButton";
 import PlayerScore from "./PlayerScore";
 import RoundResults from "./RoundResults";
@@ -12,7 +12,7 @@ import './playArea.css'
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster, PublishInput, inputs}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean, PublishInput:any, inputs:any[]}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster, inputs}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean, inputs:any[]}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState<string | null>('')
     const [inputId, setInputId] = useState<string | null>('')
@@ -133,43 +133,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     
     }
 
-    if(loading){
-        return(
-            <p>loading...</p>
-        )
-    }
-
-    else{
-        return(
-            <>
-                {/* <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults> */}
-                <PromptArea prompt={answers.prompt}></PromptArea>
-
-                {
-                    showInput ? (
-                        <PlayInput></PlayInput>
-                    ) :  (
-                        <SendAnswerLoader></SendAnswerLoader>
-                    )
-                }
-                
-
-                <p>round: {round}</p>
-
-                <PlayerScore score={score} lone={loneScore}></PlayerScore>
-
-                {
-                    isMaster ? (
-                        <p>{JSON.stringify(inputs)}</p>
-                    ) : (
-                        <></>
-                    )
-                }
-            
-            </>
-        )
-    }
-
+    
     function PlayInput(){
         return(
             <Form.Root onSubmit={SendInput}>
@@ -191,7 +155,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
             </Form.Root>
         )
     }
-
+    
     function SendAnswerLoader(){
         return (
             <div style={{alignItems: 'center', textAlign: 'center', width: '100%', margin: '1rem'}}>
@@ -202,6 +166,110 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                         <p>You answered: {confirmedInput}</p>
                         )}
             </div>
+        )
+    }
+    
+    function InputItems({inputs} : {inputs:any[]}){
+        const [inputRefs, setInputRefs] = useState<any>([])
+
+        const inputRef = useRef(null)
+
+        useEffect(() => {
+            setInputRefs([])
+            inputs.forEach((x) => {
+                setInputRefs([...inputRefs, createRef()])
+            })
+        }, inputs)
+        
+        const triggerCombination = () => {
+            console.log('triggering Combination')
+            // inputRef.current.Combine()
+            inputRefs.forEach((inputRef:any) => {
+                console.log('inside the loop')
+                inputRef.current?.Combine();
+            })
+        }
+        
+        return(
+            <div style={{display:'flex', gap:'1rem'}}>
+                {/* <InputItem input={inputs[0]?.input} inputId={inputs[0]?.inputId} ref={inputRef}></InputItem> */}
+                {inputs.map((items) => {
+                    return (
+                        <InputItem input={items.input} inputId={items.inputId}
+                                    //@ts-ignore
+                                    ref={inputRefs[items.inputId]}></InputItem>
+                    )
+                })}
+
+                <button onClick={triggerCombination} className="Button" >Combine</button>
+            </div>
+        )
+    }
+    
+    const InputItem = forwardRef(function InputItem({input, inputId}: {input:string, inputId:string}, ref) {
+        const inputRef = useRef<any>()
+        
+        const [highlighted, setHighlighted] = useState(false)
+        const [combined, setCombined] = useState(false)
+        
+        useImperativeHandle(ref, () => {
+            return{
+                Combine(){
+                    console.log('in children combining')
+                    setCombined(true);
+                },
+            }
+        });
+
+        return(
+            <div ref={inputRef}>
+                {
+                    combined ? (
+                        <></>
+                    ) : (
+                        <button className="Button">{input} {inputId}</button>
+                    )
+                }
+
+            </div>
+        )
+
+    })
+
+    if(loading){
+        return(
+            <p>loading...</p>
+        )
+    }
+    
+    else{
+        return(
+            <>
+                {/* <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults> */}
+                <PromptArea prompt={answers.prompt}></PromptArea>
+    
+                {
+                    showInput ? (
+                        <PlayInput></PlayInput>
+                    ) :  (
+                        <SendAnswerLoader></SendAnswerLoader>
+                    )
+                }
+                
+    
+                <p>round: {round}</p>
+    
+                <PlayerScore score={score} lone={loneScore}></PlayerScore>
+    
+                {
+                    isMaster ? (
+                        <InputItems inputs={inputs}></InputItems>
+                    ) : (
+                        <></>
+                    )
+                }
+            
+            </>
         )
     }
 }

@@ -1,10 +1,36 @@
 import { Redis } from "@upstash/redis"
-import Ably from 'ably'
 
 const redis = new Redis({
     url: process.env.HERD_UPSTASH_REDIS_REST_URL,
     token:process.env.HERD_UPSTASH_REDIS_REST_TOKEN,
 })
+
+const PublishAction = async (action, roomId) => {
+
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Basic ${process.env.HERD_ABLY_API_KEY}`);
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "name": ":actions",
+      "data": JSON.stringify(action)
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    //@ts-ignore
+    const result = await fetch(`https://rest.ably.io/channels/herdword:${roomId}/messages`, requestOptions)
+      .then(response => response.text())
+
+    console.log(result)
+
+    return JSON.parse(result)
+}
 
 
 export const handler = async (event, context) => {
@@ -203,12 +229,7 @@ export const handler = async (event, context) => {
 
     console.log(JSONResponse);
     
-    const ably = new Ably.Realtime.Promise(process.env.HERD_ABLY_API_KEY)
-    await ably.connection.once('connected');
-    const channel = ably.channels.get(`herdword:${roomId}`);
-    await channel.publish(`:actions`, JSON.stringify(JSONResponse));
-    console.log("published")
-    ably.close()
+    await PublishAction(JSONResponse, roomId)
 
     const response = {
         statusCode: 200,

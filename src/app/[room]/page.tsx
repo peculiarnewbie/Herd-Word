@@ -36,41 +36,11 @@ export default async function Page({ params }: { params: { room: string } }){
     
         return JSON.parse(result).body;
       }
-
-      //@ts-ignore
-      const PublishInput = async (input, inputId, passedRoomId) => {
-        'use server';
-        const message = {input, inputId}
-
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", "Basic SGdreDdBLjg1NVdXUTpHNVg5RFFFaFFTQjk3elR0VDBHZEpiX0k5bW9ua0xrSlpqUGJkaGdSN2Iw");
-        myHeaders.append("Content-Type", "application/json");
-
-        var raw = JSON.stringify({
-          "name": ":answers",
-          "data": JSON.stringify(message)
-        });
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-
-        //@ts-ignore
-        const result = await fetch(`https://rest.ably.io/channels/herdword:${passedRoomId}/messages`, requestOptions)
-          .then(response => response.text())
-
-        return JSON.parse(result)
-
-      }
-
     
 
     return(
         <div className="WebRoot">
-            <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId} PublishInput={PublishInput}></PlayerCheck>
+            <PlayerCheck CallCreateRoom={JoinRoom} roomId = {roomId}></PlayerCheck>
         </div>
     )
 

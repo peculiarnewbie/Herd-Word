@@ -15,7 +15,7 @@ let ably:Ably.Types.RealtimePromise;
 let connectedToAbly = {value: true};
 
 //@ts-ignore
-export default function PlayerCheck({CallCreateRoom, roomId, PublishInput}) {
+export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playerIdFromQuery, setFromQuery] = useState(useSearchParams()?.get('playerId'))
     // const [playerId, setPlayerId] = useState("")
     const [message, setMessage] = useState("")
@@ -41,6 +41,10 @@ export default function PlayerCheck({CallCreateRoom, roomId, PublishInput}) {
 
         DoShtForMaster()
     }, [isMaster])
+
+    useEffect(() => {
+        setInputs([])
+    }, [round])
 
     useEffect(() => {
         connectedToAbly.value = false
@@ -206,12 +210,6 @@ export default function PlayerCheck({CallCreateRoom, roomId, PublishInput}) {
         await checkAgain()
     }
 
-    //@ts-ignore
-    const CallPublishInput = async (input, inputId, passedRoomId) => {
-        console.log('calling publish input: ', input, inputId, passedRoomId)
-        await PublishInput(input, inputId, passedRoomId)
-    }
-
     const AdvanceRound = async () =>{
         setLoading(true);
         console.log("advancing round");
@@ -306,7 +304,6 @@ export default function PlayerCheck({CallCreateRoom, roomId, PublishInput}) {
                         playersWScores={playersWScores} 
                         gameParams={gameParams} 
                         isMaster={isMaster} 
-                        PublishInput={CallPublishInput}
                         inputs={inputs}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>

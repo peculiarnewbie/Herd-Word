@@ -9,7 +9,7 @@ const PublishInput = async (input, inputId, roomId, round) => {
     const message = {input, inputId, round}
 
     var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Basic SGdreDdBLjg1NVdXUTpHNVg5RFFFaFFTQjk3elR0VDBHZEpiX0k5bW9ua0xrSlpqUGJkaGdSN2Iw");
+    myHeaders.append("Authorization", `Basic ${process.env.HERD_ABLY_API_KEY}`);
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
@@ -64,7 +64,7 @@ export const handler = async (event, context) => {
     console.log("we here", sendInput);
 
     if(sendInput[1]){
-        PublishInput(input, sendInput[0], roomId, round);
+        await PublishInput(input, sendInput[0], roomId, round);
     }
 
 
