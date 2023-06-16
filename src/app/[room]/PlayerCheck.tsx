@@ -33,7 +33,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playerId, setPlayerId] = useState<string|null>('');
     let id: string | null = ''
 
-    const [isTesting, setIsTesting] = useState(true);
+    const [isTesting, setIsTesting] = useState(false);
 
     useEffect(() => {
         if(isTesting){

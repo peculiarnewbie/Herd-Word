@@ -36,10 +36,11 @@ const PublishAction = async (action, roomId) => {
 export const handler = async (event, context) => {
     const roomId = event.roomId;
     const round = event.round;
+    const combined = event.combined;
 
     const chosenAnswerCount = 2;
     
-    console.log({roomId, round})
+    console.log({roomId, round, combined})
 
     const keys = [`herdword:${roomId}`, 
     `herdword:${roomId}:${round}:inputs`,
@@ -87,7 +88,6 @@ export const handler = async (event, context) => {
     let top5Arr = [];
     let chosenArr = [];
     let playerScoresArr = {};
-
     
     if(rankedAnswers != 'null'){
         for(let i = 0; i < answers.length; i+=2){
@@ -98,10 +98,29 @@ export const handler = async (event, context) => {
         }
         for(let i = 0; i < rankedAnswers.length; i+=2){
             let obj = {inputId: rankedAnswers[i], input: answersFlat.find(s => s.inputId === rankedAnswers[i]).input , score: rankedAnswers[i + 1], highest: false}
-            if(rankedAnswers[i+1] == rankedAnswers[1] && rankedAnswers[1] > 1) obj.highest = true;
-            if(rankedAnswers[i+1] == 1) lowestArr.push(obj);
+            // if(rankedAnswers[i+1] == rankedAnswers[1] && rankedAnswers[1] > 1) obj.highest = true;
+            // if(rankedAnswers[i+1] == 1) lowestArr.push(obj);
             answersArr.push(obj);
         }
+
+        let highestScore = answersArr[0].score;
+
+        const combinedIds = JSON.parse(combined);
+
+        combinedIds.forEach((combined) => {
+            let totalScore = 0;
+            combined.forEach((id) => {
+                totalScore += parseInt(answersArr.find(s => s.inputId == id).score);
+            })
+            if(highestScore < totalScore) highestScore = totalScore;
+            combined.forEach((id) => {
+                answersArr.find(s => s.inputId == id).score = totalScore;
+            })
+        })
+
+        answersArr.forEach((answer) => {
+            if(answer.score == highestScore) answer.highest = true;
+        })
 
         console.log(answersArr, playerInputsArr);
 
@@ -129,15 +148,11 @@ export const handler = async (event, context) => {
             let pointWinner = []
             let pipe = redis.pipeline()
     
-            for(let i = 0; i < 4; i++){
+            for(let i = 0; i < answersArr.length; i++){
                 if(answersArr[i]?.highest){
                     const winners = await redis.zrange(keys[2], answersArr[i].inputId, answersArr[i].inputId, {byScore: true})
                     pointWinner = [...pointWinner, ...winners]
                 }
-                else if(i == 3){
-                    pointWinner = [];
-                }
-                else break;
             }
 
             if(pointWinner){
