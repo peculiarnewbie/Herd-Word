@@ -61,20 +61,27 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
         //     inputRef.current?.Combine();
         // })
         let newId = 1000;
-        let combinedInput:any = [];
+        let combinedInput:any = {inputs: [], highlighted: false, newId: 0};
         inputs.forEach((input:any) => {
             if(input.highlighted){
                 if(input.inputId < newId) newId = input.inputId
-                handleChildComponentChange(input.inputId, true, false)
-                combinedInput.push(input)
+                handleInputChange(input.inputId, true, false)
+                combinedInput.inputs.push(input)
             } 
         });
-        if(combinedInput.length > 1){
-            setCombinedInputs([...combinedInputs, combinedInput])
+        combinedInputs.forEach((combined:any) => {
+            if(combined.highlighted){
+                handleRemoveCombinedInput(combined.newId)
+            }
+        });
+        if(combinedInput.inputs.length > 1){
+            combinedInput.newId = newId;
+            //@ts-ignore
+            setCombinedInputs(combinedInputs => [...combinedInputs, combinedInput])
         }
         else {
-            if(combinedInput.length){
-                handleChildComponentChange(combinedInput[0].inputId, false, false)
+            if(combinedInput.inputs.length){
+                handleInputChange(combinedInput.inputs[0].inputId, false, false)
             }
         }
         console.log('combined:', combinedInput, combinedInputs)
@@ -90,13 +97,38 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
         console.log('inputs:', inputs)
     }
 
-    const handleChildComponentChange = (inputId:string, combined:boolean, highlighted:boolean) => {
+    const handleInputChange = (inputId:string, combined:boolean, highlighted:boolean) => {
         setInputs((prevState:any) =>
           prevState.map((childComponent:any) =>
               childComponent.inputId === inputId ? { ...childComponent, combined, highlighted } : childComponent
           )
         );
       };
+
+    const handleCombinedInputChange = (newId:string, highlighted:boolean) => {
+        //@ts-ignore
+        combinedInputs.find(s => s.newId == newId).inputs.forEach((input:any) => {
+            if(highlighted){
+                handleInputChange(input.inputId, true, true);
+            }
+            else{
+                handleInputChange(input.inputId, true, false);
+            }
+        })
+        setCombinedInputs((prevState:any) =>
+            prevState.map((childComponent:any) =>
+                childComponent.newId === newId ? { ...childComponent, highlighted } : childComponent
+            )
+        );
+    };
+
+    const handleRemoveCombinedInput = (newId:string) => {
+        setCombinedInputs((combinedInputs:any) => 
+            combinedInputs.filter((combinedInput:any) => combinedInput.newId !== newId)
+        )
+        if(combinedInputs.length == 0) setCombinedInputs([])
+        console.log(combinedInputs)
+    }
 
     const InputItem = ({input, inputId, combined, highlighted, OnChange}: {input:string, inputId:string, combined:boolean, highlighted:boolean, OnChange:any}) => {
 
@@ -113,13 +145,10 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
     
     }
 
-    const CombinedInputItem = ({inputs, OnChange}: {inputs:any, OnChange:any}) => {
-        const [highlighted, setHighlighted] = useState(false)
-
-        console.log(inputs)
+    const CombinedInputItem = ({inputs, newId, highlighted, OnChange}: {inputs:any, newId:number, highlighted:boolean, OnChange:any}) => {
+        
         const handleButtonClick = () => {
-            setHighlighted(!highlighted)
-            // OnChange(inputId, false, !highlighted);
+            OnChange(newId, !highlighted);
         }
     
         return(
@@ -142,13 +171,13 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
             <div style={{display:'flex',  gap:'1rem'}}>
                 {combinedInputs.map((items:any, index:number) => {
                     return(
-                        <CombinedInputItem inputs={items} OnChange={() => {}}></CombinedInputItem>
+                        <CombinedInputItem inputs={items.inputs} newId={items.newId} highlighted={items.highlighted} OnChange={handleCombinedInputChange}></CombinedInputItem>
                     )
                 })}
                 {inputs.map((items:any, index:number) => {
                     return (
                         <InputItem input={items.input} inputId={items.inputId} combined={items.combined} highlighted={items.highlighted}
-                        OnChange={handleChildComponentChange}
+                        OnChange={handleInputChange}
                         //@ts-ignore
                         ref={inputRefs[index]}></InputItem>
                         )
