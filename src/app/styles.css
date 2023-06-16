@@ -87,7 +87,7 @@ button {
   padding: 10px;
 }
 
-.Button, .Button--light {
+.Button, .Button--light, .Button--highlighted, .Button--combined, .Button--combined--highlighted {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -103,12 +103,21 @@ button {
   color: var(--violet11);
   box-shadow: 0 2px 10px var(--blackA7);
 }
-.Button:hover {
+.Button:hover, .Button--highlighted:hover, .Button--combined:hover, .Button--combined--highlighted:hover {
   background-color: var(--mauve11);
   color: var(--violet3);
 }
 .Button:focus {
   box-shadow: 0 0 0 2px black;
+}
+.Button--highlighted, .Button--combined--highlighted{
+  box-shadow: 0 0 10px var(--violet11);
+}
+.Button--combined, .Button--combined--highlighted{
+  flex-direction: column;
+  gap: 0.5rem;
+  height: auto;
+  padding: 10px 0;
 }
 
 .Button--light{

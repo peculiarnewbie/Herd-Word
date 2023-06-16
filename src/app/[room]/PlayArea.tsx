@@ -13,7 +13,7 @@ import InputItems from "./InputItems";
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster, isTesting}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean, isTesting:boolean}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState<string | null>('')
     const [inputId, setInputId] = useState<string | null>('')
@@ -199,7 +199,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     
                 {
                     isMaster ? (
-                        <InputItems round={round} roomId={roomId}></InputItems>
+                        <InputItems round={round} roomId={roomId} isTesting={isTesting}></InputItems>
                     ) : (
                         <></>
                     )

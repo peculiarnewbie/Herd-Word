@@ -23,7 +23,10 @@ export default function RoomLobby({loading, joined, message, players, roomId, se
 
     if(loading){
         return(
-            <p>loading...</p>
+            <div className="RoomLobbyLoading">
+                <p>loading...</p>
+
+            </div>
         )
     }
 

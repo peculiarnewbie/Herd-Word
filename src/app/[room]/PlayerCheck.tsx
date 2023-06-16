@@ -33,6 +33,17 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [playerId, setPlayerId] = useState<string|null>('');
     let id: string | null = ''
 
+    const [isTesting, setIsTesting] = useState(true);
+
+    useEffect(() => {
+        if(isTesting){
+            setLoading(!isTesting)
+            setRound(2)
+            setIsMaster(true)
+
+        }
+    }, [isTesting])
+
     useEffect(() => {
         const DoShtForMaster = async () =>{
 
@@ -42,6 +53,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     }, [isMaster])
 
     useEffect(() => {
+        if(isTesting) return;
+
         connectedToAbly.value = false
         const ConnectToAbly  = async () => {
             ably = new Ably.Realtime.Promise('Hgkx7A.uh4-mw:xL8aBh7e8pmmR9RdXWJMsSaMuznBJDztdy6AWzJPyBw');
@@ -62,7 +75,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     }, [])
 
     useEffect(() => {
-        
+        if(isTesting) return;
 
         const  CheckPlayer = async () => {
             if(isMaster){
@@ -283,7 +296,8 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                         answers={answers} 
                         playersWScores={playersWScores} 
                         gameParams={gameParams} 
-                        isMaster={isMaster}></PlayArea>
+                        isMaster={isMaster}
+                        isTesting={isTesting}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>

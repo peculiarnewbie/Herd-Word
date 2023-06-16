@@ -98,7 +98,10 @@ export default function CreateRoom({roomId, playerId, loading, setLoading, setJo
 
     if(loading){
         return(
+          <div className='CreateRoomLoading'>
             <p>loading...</p>
+
+          </div>
         )
     }
 
