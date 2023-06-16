@@ -23,7 +23,6 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [loading, setLoading] = useState(true)
     const [players, setPlayers] = useState([''])
     const [answers, setAnswers] = useState({prompt: '', chosen: [], highest: [], lone: []})
-    const [inputs, setInputs] = useState<any>([])
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
@@ -41,10 +40,6 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
         DoShtForMaster()
     }, [isMaster])
-
-    useEffect(() => {
-        setInputs([])
-    }, [round])
 
     useEffect(() => {
         connectedToAbly.value = false
@@ -171,22 +166,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                 // ReceiveRoomAction(message.data)
             });
 
-            if(isMaster) await SubToAblyAnswers()
-
             console.log('subbed to actions')
-        }
-
-        const SubToAblyAnswers = async () => {
-            await answerChannel.subscribe(':answers', (message) => {
-                console.log('Received an answer in realtime: ' + message.data)
-                const messageObj = JSON.parse(message.data)
-                //@ts-ignore
-                setInputs(inputs => [...inputs, messageObj])
-                // ReceiveRoomAction(message.data)
-            });
-
-            console.log('subbed to answers')
-
         }
 
         CheckPlayer()
@@ -303,8 +283,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                         answers={answers} 
                         playersWScores={playersWScores} 
                         gameParams={gameParams} 
-                        isMaster={isMaster} 
-                        inputs={inputs}></PlayArea>
+                        isMaster={isMaster}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>

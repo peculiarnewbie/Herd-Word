@@ -8,11 +8,12 @@ import RoundResults from "./RoundResults";
 import { GameParams } from "./CreateRoom";
 import PromptArea from "./PromptArea";
 import './playArea.css'
+import InputItems from "./InputItems";
 
 
 
 
-export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster, inputs}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean, inputs:any[]}){
+export default function PlayArea({loading, round, roomId, playerId, answers, playersWScores, gameParams, isMaster}: {loading:boolean, round:number, roomId:string, playerId:string | null, answers:any, playersWScores:any, gameParams:any, isMaster:boolean}){
     const [showInput, setShowInput] = useState(true);
     const [confirmedInput, setConfirmedInput] = useState<string | null>('')
     const [inputId, setInputId] = useState<string | null>('')
@@ -169,75 +170,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         )
     }
     
-    function InputItems({inputs} : {inputs:any[]}){
-        const [inputRefs, setInputRefs] = useState<any>([])
-
-        const inputRef = useRef(null)
-
-        useEffect(() => {
-            let newRefs:any = []
-            inputs.forEach((x) => {
-                console.log('adding refs')
-                newRefs = [...newRefs, createRef()]
-            })
-            setInputRefs(newRefs)
-            console.log(inputRefs)
-        }, [inputs])
-        
-        const triggerCombination = () => {
-            console.log('triggering Combination')
-            // inputRef.current.Combine()
-            inputRefs.forEach((inputRef:any) => {
-                console.log('inside the loop')
-                inputRef.current?.Combine();
-            })
-        }
-        
-        return(
-            <div style={{display:'flex', gap:'1rem'}}>
-                {/* <InputItem input={inputs[0]?.input} inputId={inputs[0]?.inputId} ref={inputRef}></InputItem> */}
-                {inputs.map((items) => {
-                    return (
-                        <InputItem input={items.input} inputId={items.inputId}
-                                    //@ts-ignore
-                                    ref={inputRefs[items.inputId]}></InputItem>
-                    )
-                })}
-
-                <button onClick={triggerCombination} className="Button" >Combine</button>
-            </div>
-        )
-    }
     
-    const InputItem = forwardRef(function InputItem({input, inputId}: {input:string, inputId:string}, ref) {
-        const inputRef = useRef<any>()
-        
-        const [highlighted, setHighlighted] = useState(false)
-        const [combined, setCombined] = useState(false)
-        
-        useImperativeHandle(ref, () => {
-            return{
-                Combine(){
-                    console.log('in children combining')
-                    setCombined(true);
-                },
-            }
-        });
-
-        return(
-            <div ref={inputRef}>
-                {
-                    combined ? (
-                        <></>
-                    ) : (
-                        <button className="Button">{input} {inputId}</button>
-                    )
-                }
-
-            </div>
-        )
-
-    })
 
     if(loading){
         return(
@@ -266,7 +199,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     
                 {
                     isMaster ? (
-                        <InputItems inputs={inputs}></InputItems>
+                        <InputItems round={round} roomId={roomId}></InputItems>
                     ) : (
                         <></>
                     )
