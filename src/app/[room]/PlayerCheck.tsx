@@ -26,7 +26,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [round, setRound] = useState(0);
-    const [roomInfo, setRoomInfo] = useState({})
+    const [combinedIds, setCombinedIds] = useState<any>([])
     const [playersWScores, setPlayersWScores] = useState({highest:[], lonest:[]})
     const [gameParams, setGameParams] = useState({})
     let fromCookie = false;
@@ -205,14 +205,15 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
 
     const AdvanceRound = async () =>{
         setLoading(true);
-        console.log("advancing round");
+        console.log("advancing round, combined:", combinedIds);
     
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "text/plain");
         
         var raw = JSON.stringify({
           "roomId": `${roomId}`,
-          "round": `${round}`
+          "round": `${round}`,
+          "combined": JSON.stringify(combinedIds)
         });
         
         var requestOptions = {
@@ -297,6 +298,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                         playersWScores={playersWScores} 
                         gameParams={gameParams} 
                         isMaster={isMaster}
+                        setCombinedIds={setCombinedIds}
                         isTesting={isTesting}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>

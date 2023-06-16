@@ -5,9 +5,11 @@ import '../styles.css'
 let answerChannel:Ably.Types.RealtimeChannelPromise;
 let ably:Ably.Types.RealtimePromise;
 
-export default function InputItems({round, roomId, isTesting}:{round:number, roomId:string, isTesting:boolean}){
+export default function InputItems({round, roomId, isTesting, onCombine}:{round:number, roomId:string, isTesting:boolean, onCombine:any}){
     const [inputs, setInputs] = useState<any>([])
     const [combinedInputs, setCombinedInputs] = useState<any>([])
+
+    const [combinedIds, setCombinedIds] = useState<any>([])
 
     const [inputRefs, setInputRefs] = useState<any>([])
 
@@ -54,6 +56,10 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
         })
         setInputRefs(newRefs)
     }, [inputs])
+
+    useEffect(() => {
+        onCombine(combinedIds)
+    }, [combinedIds])
     
     const triggerCombination = () => {
         // inputRef.current.Combine()
@@ -62,11 +68,13 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
         // })
         let newId = 1000;
         let combinedInput:any = {inputs: [], highlighted: false, newId: 0};
+        let combinedId:any = []
         inputs.forEach((input:any) => {
             if(input.highlighted){
                 if(input.inputId < newId) newId = input.inputId
                 handleInputChange(input.inputId, true, false)
                 combinedInput.inputs.push(input)
+                combinedId.push(input.inputId);
             } 
         });
         combinedInputs.forEach((combined:any) => {
@@ -78,6 +86,8 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
             combinedInput.newId = newId;
             //@ts-ignore
             setCombinedInputs(combinedInputs => [...combinedInputs, combinedInput])
+            //@ts-ignore
+            setCombinedIds(combinedIds => [...combinedIds, combinedId])
         }
         else {
             if(combinedInput.inputs.length){
@@ -189,7 +199,7 @@ export default function InputItems({round, roomId, isTesting}:{round:number, roo
                 isTesting ? (
                     <button onClick={addTestInput} className="Button" >Add Test</button>
 
-                ) : (<></>)
+                ) : null
             }
         </div>
     )
