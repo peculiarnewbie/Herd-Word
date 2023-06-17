@@ -1,13 +1,17 @@
+@import '@radix-ui/colors/blackA.css';
+@import '@radix-ui/colors/slate.css';
+@import '@radix-ui/colors/violet.css';
 
 .PromptRoot{
     display: flex;
     justify-content: center;
-    background-color: aqua;
+    background-color: var(--slate11);
+    border-radius: 20px;
     width: 100%;
+    margin-top: 10px;
 }
 
 .PromptArea{
-    background-color: purple;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,12 +19,20 @@
     padding: 2rem;
 }
 
+.PromptElement{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
 .PromptText{
     border-radius: 10px;
     border: 3px solid white;
     height: 3rem;
     padding: 10px;
-    background-color: blueviolet;
+    background-color: var(--violet9);
     display: flex;
     align-items: center;
 }

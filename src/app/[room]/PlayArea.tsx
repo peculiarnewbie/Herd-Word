@@ -72,7 +72,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
         //     else break;
         // }
 
-        if(round > 1){
+        if(round > 0){
             for(let i = 0; i < answers?.highest?.length; i++){
                 if(inputId == answers.highest[i].inputId) {
                     if(answers.highest[i].highest) setScore(score + 1)
@@ -181,7 +181,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     else{
         return(
             <>
-                {/* <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults> */}
+                <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
                 <PromptArea prompt={answers.prompt}></PromptArea>
     
                 {

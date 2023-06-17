@@ -37,6 +37,7 @@ export const handler = async (event, context) => {
     const roomId = event.roomId;
     const round = event.round;
     const combined = event.combined;
+    const combinedIds = JSON.parse(combined);
 
     const chosenAnswerCount = 2;
     
@@ -105,8 +106,6 @@ export const handler = async (event, context) => {
 
         let highestScore = answersArr[0].score;
 
-        const combinedIds = JSON.parse(combined);
-
         combinedIds.forEach((combined) => {
             let totalScore = 0;
             combined.forEach((id) => {
@@ -118,31 +117,34 @@ export const handler = async (event, context) => {
             })
         })
 
-        answersArr.forEach((answer) => {
-            if(answer.score == highestScore) answer.highest = true;
-        })
+        answersArr.sort((a, b) => (a.score < b.score) ? 1 : -1)
+
+        for(let i = 0; i < answersArr.length; i++){
+            if(answersArr[i].score == highestScore) answersArr[i].highest = true;
+            else break;
+        }
 
         console.log(answersArr, playerInputsArr);
 
-        if(round == '1'){
-            lowestArr = [];
+        // if(round == '1'){
+        //     lowestArr = [];
 
-            // const min = 0;
-            // const max = playerInputsArr.length - 1;
-            // const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
-            // let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-            // while(randomInt1 == randomInt2){
-            //     if(max == 1) break;
-            //     randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-            // } 
+        //     // const min = 0;
+        //     // const max = playerInputsArr.length - 1;
+        //     // const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
+        //     // let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+        //     // while(randomInt1 == randomInt2){
+        //     //     if(max == 1) break;
+        //     //     randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+        //     // } 
 
-            // let chosen1 = playerInputsArr[randomInt1]
-            // let chosen2 = playerInputsArr[randomInt2]
+        //     // let chosen1 = playerInputsArr[randomInt1]
+        //     // let chosen2 = playerInputsArr[randomInt2]
             
-            // chosenArr.push({playerId: chosen1.playerId, input: answersArr.find(s => s.inputId == chosen1.inputId).input},
-            //                 {playerId: chosen2.playerId, input: answersArr.find(s => s.inputId == chosen2.inputId).input})
-        }
-        else{
+        //     // chosenArr.push({playerId: chosen1.playerId, input: answersArr.find(s => s.inputId == chosen1.inputId).input},
+        //     //                 {playerId: chosen2.playerId, input: answersArr.find(s => s.inputId == chosen2.inputId).input})
+        // }
+        // else{
 
             //update score in redis
             let pointWinner = []
@@ -153,6 +155,7 @@ export const handler = async (event, context) => {
                     const winners = await redis.zrange(keys[2], answersArr[i].inputId, answersArr[i].inputId, {byScore: true})
                     pointWinner = [...pointWinner, ...winners]
                 }
+                if(answersArr[i].score == 1) lowestArr.push(answersArr[i]);
             }
 
             if(pointWinner){
@@ -205,24 +208,24 @@ export const handler = async (event, context) => {
 
 
             //choose next promt
-            if(lowestArr.length > 2){
-                const min = 0;
-                const max = lowestArr.length - 1;
-                const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
-                let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-                while(randomInt1 == randomInt2) randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
-                chosenArr.push(lowestArr[randomInt1], lowestArr[randomInt2])
-            }
-            else{
-                chosenArr.push(answersArr[answersArr.length-1], answersArr[answersArr.length-2])
-            }
+            // if(lowestArr.length > 2){
+            //     const min = 0;
+            //     const max = lowestArr.length - 1;
+            //     const randomInt1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            //     let randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+            //     while(randomInt1 == randomInt2) randomInt2 = Math.floor(Math.random() * (max - min + 1)) + min;
+            //     chosenArr.push(lowestArr[randomInt1], lowestArr[randomInt2])
+            // }
+            // else{
+            //     chosenArr.push(answersArr[answersArr.length-1], answersArr[answersArr.length-2])
+            // }
 
             //create top 5 answers
             for(let i = 0; i < 5; i++){
                 top5Arr.push(answersArr[i])
                 if(i == answersArr.length - 1) break;
             }
-        }
+        // }
         
 
     }
@@ -240,7 +243,8 @@ export const handler = async (event, context) => {
                         prompt: prompt,
                         highestAnswers: top5Arr,
                         loneAnswers: lowestArr,
-                        playerScores: playerScoresArr}
+                        playerScores: playerScoresArr,
+                        combined: combinedIds}
 
     console.log(JSONResponse);
     

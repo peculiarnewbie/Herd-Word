@@ -8,7 +8,6 @@ export default function PromptArea({prompt} : {prompt: string | string[]}){
 
             <div className='PromptArea'>
                 <div className='PromptElement'>
-                    <p>prompt:</p>
                     <div className='PromptText'>
                         <p>{prompt}</p>
 

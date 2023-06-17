@@ -1,44 +1,41 @@
 
 export default function RoundResults({round, answers, playersWScores}:{round:number, answers:any, playersWScores:any}){
-    if(round == 1){
-        return(
-            <>
-                <p>prompt: </p>
-                <p>{answers?.prompt}</p>
-            </>
-        )
-    }
-    else if (round == 2){
-        return(
-            <>
-                <p>prompt: </p>
-                <p>{answers?.prompt}</p>
-            </>
-        )
-    }
-    else{
-        return(
-            <>
-                {/* <p>chosen: </p>
-                <p>1. {answers?.chosen[0]?.input} by {answers?.chosen[0]?.playerId}</p>
-                <p>2. {answers?.chosen[1]?.input} by {answers?.chosen[1]?.playerId}</p> */}
-                <p>prompt: </p>
-                <p>{answers?.prompt}</p>
-                <p>highest: </p>
-                <p>1. {answers?.highest[0]?.input} score: {answers?.highest[0]?.score}</p>
-                <p>2. {answers?.highest[1]?.input} score: {answers?.highest[1]?.score}</p>
-                <p>3. {answers?.highest[2]?.input} score: {answers?.highest[2]?.score}</p>
-                <p>lone: {JSON.stringify(answers.lone)}</p>
-                <p>leader: </p>
-                <p>1. {playersWScores?.highest[0]?.playerId} score: {playersWScores?.highest[0]?.score}</p>
-                <p>2. {playersWScores?.highest[1]?.playerId} score: {playersWScores?.highest[1]?.score}</p>
-                <p>3. {playersWScores?.highest[2]?.playerId} score: {playersWScores?.highest[2]?.score}</p>
-                <p>lonest: </p>
-                <p>1. {playersWScores?.lonest[0]?.playerId} score: {playersWScores?.lonest[0]?.score}</p>
-                <p>2. {playersWScores?.lonest[1]?.playerId} score: {playersWScores?.lonest[1]?.score}</p>
-                <p>3. {playersWScores?.lonest[2]?.playerId} score: {playersWScores?.lonest[2]?.score}</p>
-            </>
+    
+    return(
+        <>
+            <p>highest:</p>
+            {
+                answers?.highest?.map((answer:any, index:number) => {
+                    return(
+                        <p>{index}. {answer.input} score: {answer.score}</p>
+                    )
+                })
+            }
+            <p>lone:</p>
+            {
+                answers?.lone?.map((answer:any, index:number) => {
+                    return(
+                        <p>{index}. {answer.input} score: {answer.score}</p>
+                    )
+                })
+            }
+            <p>leader:</p>
+            {
+                playersWScores?.highest?.map((player:any) => {
+                    return(
+                        <p>1. {player.playerId} score: {player.score}</p>
+                    )
+                })
+            }
+            <p>lonest:</p>
+            {
+                playersWScores?.lonest?.map((player:any) => {
+                    return(
+                        <p>1. {player.playerId} score: {player.score}</p>
+                    )
+                })
+            }
+        </>
 
-        )
-    }
+    )
 }
