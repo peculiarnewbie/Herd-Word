@@ -186,7 +186,7 @@ export default function InputItems({round, roomId, isTesting, onCombine}:{round:
                 })}
                 {inputs.map((items:any, index:number) => {
                     return (
-                        <InputItem input={items.input} inputId={items.inputId} combined={items.combined} highlighted={items.highlighted}
+                        <InputItem key={index} input={items.input} inputId={items.inputId} combined={items.combined} highlighted={items.highlighted}
                         OnChange={handleInputChange}
                         //@ts-ignore
                         ref={inputRefs[index]}></InputItem>
