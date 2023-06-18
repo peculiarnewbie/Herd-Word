@@ -71,6 +71,43 @@ export const handler = async (event, context) => {
         args
     );
 
+    
+    if(roomId == 'gigameet'){
+        const getGigaQuestions = await redis.eval(
+            `
+                return redis.call('ZRANGE', KEYS[1], '0', '-1')
+            `,
+            [`herdword:questions:gigaspecial`],
+            []
+        )
+
+        const customGigaIndex = [5, 8, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        const keys2 = [`herdword:questions:gigaspecial`, `herdword:${roomId}:questions`];
+	    const args2 = []
+
+        const addGigaQuestions = await redis.eval(
+            `
+                local gigaIndex = {}
+                gigaIndex[1] = 5
+                gigaIndex[2] = 8
+                gigaIndex[3] = 10
+                local remainingLength = 9
+                
+                for i = 4, remainingLength do
+                    gigaIndex[i] = i+8
+                end
+
+                local gigaQuestions = redis.call('ZRANGE', KEYS[1], '0', '-1')
+
+                for i = 1, #gigaIndex do
+                    local newQ = redis.call('HSET', KEYS[2], gigaIndex[i], gigaQuestions[i])
+                end
+            `,
+            keys2,
+            args2
+        )
+    }
+
     console.log("we here", createRoom);
 
     const parsed = JSON.parse(JSON.stringify(createRoom));

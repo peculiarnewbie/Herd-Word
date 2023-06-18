@@ -246,6 +246,15 @@ export const handler = async (event, context) => {
                         playerScores: playerScoresArr,
                         combined: combinedIds}
 
+    if(roomId == 'gigameet' && parsed.round == 21){
+        JSONResponse = {round:parsed.round,
+                        prompt: 'hore kelar :)',
+                        highestAnswers: top5Arr,
+                        loneAnswers: lowestArr,
+                        playerScores: playerScoresArr,
+                        combined: combinedIds}
+    }
+
     console.log(JSONResponse);
     
     await PublishAction(JSONResponse, roomId)

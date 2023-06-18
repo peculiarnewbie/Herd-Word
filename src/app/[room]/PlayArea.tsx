@@ -181,7 +181,6 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
     else{
         return(
             <>
-                <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
                 <PromptArea prompt={answers.prompt}></PromptArea>
     
                 {
@@ -189,13 +188,19 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                         <PlayInput></PlayInput>
                     ) :  (
                         <SendAnswerLoader></SendAnswerLoader>
-                    )
-                }
+                        )
+                    }
                 
-    
-                <p>round: {round}</p>
-    
-                <PlayerScore score={score} lone={loneScore}></PlayerScore>
+                        <p>round: {round}</p>
+                <div style={{display: 'flex', gap: '1rem',}}>
+                    <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
+                        
+                    <div style={{display: 'flex', flexDirection: 'column'}}>
+            
+                        <PlayerScore score={score} lone={loneScore}></PlayerScore>
+                    </div>
+
+                </div>
     
                 {
                     isMaster ? (
