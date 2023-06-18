@@ -203,11 +203,11 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                 </div>
     
                 {
-                    // isMaster ? (
-                    //     <InputItems round={round} roomId={roomId} isTesting={isTesting} onCombine={setCombinedIds}></InputItems>
-                    // ) : (
-                    //     <></>
-                    // )
+                    isMaster ? (
+                        <InputItems round={round} roomId={roomId} isTesting={isTesting} onCombine={setCombinedIds}></InputItems>
+                    ) : (
+                        <></>
+                    )
                 }
             
             </>
