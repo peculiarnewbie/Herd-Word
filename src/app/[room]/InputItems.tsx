@@ -165,9 +165,9 @@ export default function InputItems({round, roomId, isTesting, onCombine}:{round:
             <button className={`Button--combined${highlighted ? '--highlighted' : ''}`}
                     onClick={handleButtonClick}>
             {
-                inputs.map((items:any) => {
+                inputs.map((items:any, index:number) => {
                     return(
-                            <button>{items.input} {items.inputId}</button>
+                            <button key={index}>{items.input} {items.inputId}</button>
                     )
                 })
             }
@@ -181,7 +181,7 @@ export default function InputItems({round, roomId, isTesting, onCombine}:{round:
             <div style={{display:'flex',  gap:'1rem'}}>
                 {combinedInputs.map((items:any, index:number) => {
                     return(
-                        <CombinedInputItem inputs={items.inputs} newId={items.newId} highlighted={items.highlighted} OnChange={handleCombinedInputChange}></CombinedInputItem>
+                        <CombinedInputItem key={index} inputs={items.inputs} newId={items.newId} highlighted={items.highlighted} OnChange={handleCombinedInputChange}></CombinedInputItem>
                     )
                 })}
                 {inputs.map((items:any, index:number) => {

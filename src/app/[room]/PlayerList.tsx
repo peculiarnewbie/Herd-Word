@@ -38,7 +38,7 @@ export default function PlayerList({players, roomId}: {players:string[], roomId:
                 <ScrollArea.Viewport className="ScrollAreaViewport">
                 <div style={{ padding: '15px 20px' }}>
                     <div className="Text">Players</div>
-                    {playersArr.map((tag) => (
+                    {playersArr.map((tag, index) => (
                     <div className="Tag" key={tag}>
                         {tag}
                     </div>

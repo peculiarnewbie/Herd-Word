@@ -290,7 +290,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
     else{
         return(
             <>
-                {/* <PlayArea loading={loading} 
+                <PlayArea loading={loading} 
                         round={round} 
                         roomId={roomId} 
                         playerId={playerId} 
@@ -299,7 +299,7 @@ export default function PlayerCheck({CallCreateRoom, roomId}) {
                         gameParams={gameParams} 
                         isMaster={isMaster}
                         setCombinedIds={setCombinedIds}
-                        isTesting={isTesting}></PlayArea> */}
+                        isTesting={isTesting}></PlayArea>
                 <OptionalButton show={isMaster && !loading} text="NextRound" onClick={AdvanceRound}></OptionalButton>
                 <OptionalButton show={isMaster && !loading} text="Del" onClick={DelCommand}></OptionalButton>
             </>
