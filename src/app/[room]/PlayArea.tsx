@@ -193,7 +193,7 @@ export default function PlayArea({loading, round, roomId, playerId, answers, pla
                 
                         <p>round: {round}</p>
                 <div style={{display: 'flex', gap: '1rem',}}>
-                    <RoundResults round={round} answers={answers} playersWScores={playersWScores}></RoundResults>
+                    <RoundResults answers={answers} playersWScores={playersWScores}></RoundResults>
                         
                     <div style={{display: 'flex', flexDirection: 'column'}}>
             

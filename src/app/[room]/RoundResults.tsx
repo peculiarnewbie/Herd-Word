@@ -9,7 +9,7 @@ export default function RoundResults({answers, playersWScores}:{answers:any, pla
                 {
                     answers?.highest?.map((answer:any, index:number) => {
                         return(
-                            <p>{index}. {answer.input} score: {answer.score}</p>
+                            <p key={index}>{index}. {answer.input} score: {answer.score}</p>
                             )
                         })
                     }
@@ -17,7 +17,7 @@ export default function RoundResults({answers, playersWScores}:{answers:any, pla
                 {
                     answers?.lone?.map((answer:any, index:number) => {
                         return(
-                            <p>{index}. {answer.input} score: {answer.score}</p>
+                            <p key={index}>{index}. {answer.input} score: {answer.score}</p>
                             )
                         })
                     }
@@ -26,17 +26,17 @@ export default function RoundResults({answers, playersWScores}:{answers:any, pla
                 <p>scores</p>
                 <p>leader:</p>
                 {
-                    playersWScores?.highest?.map((player:any) => {
+                    playersWScores?.highest?.map((player:any, index:number) => {
                         return(
-                            <p>1. {player.playerId} score: {player.score}</p>
+                            <p key={index}>1. {player.playerId} score: {player.score}</p>
                         )
                     })
                 }
                 <p>lonest:</p>
                 {
-                    playersWScores?.lonest?.map((player:any) => {
+                    playersWScores?.lonest?.map((player:any, index:number) => {
                         return(
-                            <p>1. {player.playerId} score: {player.score}</p>
+                            <p key={index}>1. {player.playerId} score: {player.score}</p>
                             )
                     })
                 }
