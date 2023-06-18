@@ -1,5 +1,5 @@
 
-export default function RoundResults({round, answers, playersWScores}:{round:number, answers:any, playersWScores:any}){
+export default function RoundResults({answers, playersWScores}:{answers:any, playersWScores:any}){
     
     return(
         <div style={{display: 'flex', gap: '1rem'}}>
